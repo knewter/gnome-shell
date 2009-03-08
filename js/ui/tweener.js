@@ -1,11 +1,7 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 
-const Clutter = imports.gi.Clutter;
-const Lang = imports.lang;
-const Mainloop = imports.mainloop;
-const Signals = imports.signals;
-const Tweener = imports.tweener.tweener;
-
+// = Tweener =
+//
 // This is a wrapper around imports.tweener.tweener that adds a bit of
 // Clutter integration and some additional callbacks:
 //
@@ -29,18 +25,22 @@ const Tweener = imports.tweener.tweener;
 // tween completes and then another is added before returning to the
 // main loop, the complete callback will not be called (until the new
 // tween finishes).
-
-
+//
 // ActionScript Tweener methods that imports.tweener.tweener doesn't
 // currently implement: getTweens, getVersion, registerTransition,
 // setTimeScale, updateTime.
-
+//
 // imports.tweener.tweener methods that we don't re-export:
 // pauseAllTweens, removeAllTweens, resumeAllTweens. (It would be hard
 // to clean up properly after removeAllTweens, and also, any code that
 // calls any of these is almost certainly wrong anyway, because they
 // affect the entire application.)
 
+const Clutter = imports.gi.Clutter;
+const Lang = imports.lang;
+const Mainloop = imports.mainloop;
+const Signals = imports.signals;
+const Tweener = imports.tweener.tweener;
 
 // Called from Main.start
 function init() {

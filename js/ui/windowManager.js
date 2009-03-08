@@ -1,5 +1,10 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 
+// = Window Manager =
+//
+// In the {{{js.ui.windowManager}}} module, the {{{WindowManager}}} class is
+// implemented.
+
 const Clutter = imports.gi.Clutter;
 const Mainloop = imports.mainloop;
 const Meta = imports.gi.Meta;

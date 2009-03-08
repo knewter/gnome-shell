@@ -1,5 +1,10 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 
+// = The Main Script =
+//
+// In the {{{js.ui.main}}}, module, the pieces of the shell are glued together
+// and initialized within {{{start()}}}.
+
 const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
 const Mainloop = imports.mainloop;

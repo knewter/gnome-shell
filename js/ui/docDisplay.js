@@ -1,5 +1,11 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 
+// = Document Display =
+//
+// In the {{{js.ui.docDisplay}}} module, the {{{DocDisplayItem}}} and
+// {{{DocDisplay}}} classes are defined to manage displaying a collection of
+// document items.
+
 const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;

@@ -1,5 +1,12 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 
+// = The Run Dialog =
+//
+// In the {{{js.ui.runDialog}}} module, the {{{RunDialog}}} class is defined.
+// This shows a dialog that can be used for executing commands.
+//
+// A special command is {{{restart}}}, which restarts the shell.
+
 const Clutter = imports.gi.Clutter;
 const Shell = imports.gi.Shell;
 const Signals = imports.signals;

@@ -1,4 +1,8 @@
 /* -*- mode: js2; js2-basic-offset: 4; tab-width: 4; indent-tabs-mode: nil -*- */
+// = Drag-and-Drop =
+//
+// The {{{js.ui.dnd}}} module implements a {{{makeDraggable()}}} function to
+// enable drag-and-drop on an actor.
 
 const Lang = imports.lang;
 const Signals = imports.signals;

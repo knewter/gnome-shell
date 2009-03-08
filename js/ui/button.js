@@ -1,5 +1,9 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 
+// = Button =
+//
+// The {{{js.ui.button}}} module defines a class for buttons added to the stage.
+
 const Big = imports.gi.Big;
 const Clutter = imports.gi.Clutter;
 

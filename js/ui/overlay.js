@@ -1,5 +1,11 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 
+// = Overlay =
+//
+// In the {{{js.ui.overlay}}} module, the overlay is defined.  It allows for
+// switching workspaces and windws, launching applications and opening
+// documents.
+
 const Big = imports.gi.Big;
 const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;

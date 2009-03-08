@@ -1,5 +1,11 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 
+// = Generic Display =
+//
+// The {{{js.ui.genericDisplay}}} module contains virtual {{{GenericDisplay}}}
+// and {{{GenericDisplayItem}}} classes for displaying collections of items,
+// like documents and applications.
+
 const Big = imports.gi.Big;
 const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;

@@ -1,16 +1,22 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 
+// = Link =
+//
+// In the {{{js.ui.link}}} module, the {{{Link}}} class is defined for
+// displaying a clickable links.  Right now it just handles properly capturing
+// press and release events and short-circuiting the button handling in
+// {{{ClutterText}}}, but more features like different colors for hover/pressed
+// states or a different mouse cursor could be implemented.
+
 const Clutter = imports.gi.Clutter;
 const Lang = imports.lang;
 const Signals = imports.signals;
 
-// Link is a clickable link. Right now it just handles properly capturing
-// press and release events and short-circuiting the button handling in
-// ClutterText, but more features like different colors for hover/pressed states
-// or a different mouse cursor could be implemented.
+// == {{{Link(props)}}} ==
 //
-// The properties passed in are forwarded to the Clutter.Text() constructor,
-// so can include, 'text', 'font_name', etc.
+// The properties passed in are forwarded to the {{{Clutter.Text()}}}
+// constructor, so can include {{{text}}}, {{{font_name}}}, etc.
+
 function Link(props) {
     this._init(props);
 }

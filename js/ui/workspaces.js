@@ -1,5 +1,10 @@
 /* -*- mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil -*- */
 
+// = Workspaces =
+//
+// In the {{{js.ui.workspaces}}} module, various classes are implemented for
+// managing and displaying workspaces.
+
 const Big = imports.gi.Big;
 const Clutter = imports.gi.Clutter;
 const GdkPixbuf = imports.gi.GdkPixbuf;
