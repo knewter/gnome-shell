@@ -11,12 +11,21 @@ const Main = imports.ui.main;
 
 const PANEL_HEIGHT = 32;
 const TRAY_HEIGHT = 24;
+const SHADOW_HEIGHT = 6;
 const PANEL_BACKGROUND_COLOR = new Clutter.Color();
 PANEL_BACKGROUND_COLOR.from_pixel(0xeeddccff);
+const PANEL_TOP_COLOR = new Clutter.Color();
+PANEL_TOP_COLOR.from_pixel(0xffffff99);
+const PANEL_MIDDLE_COLOR = new Clutter.Color();
+PANEL_MIDDLE_COLOR.from_pixel(0xffffff88);
+const PANEL_BOTTOM_COLOR = new Clutter.Color();
+PANEL_BOTTOM_COLOR.from_pixel(0xffffffaa);
+const SHADOW_COLOR = new Clutter.Color();
+SHADOW_COLOR.from_pixel(0x00000033);
+const TRANSPARENT_COLOR = new Clutter.Color();
+TRANSPARENT_COLOR.from_pixel(0x00000000);
 const PANEL_BUTTON_COLOR = new Clutter.Color();
 PANEL_BUTTON_COLOR.from_pixel(0xccbbaa66);
-const PANEL_BORDER_COLOR = new Clutter.Color();
-PANEL_BORDER_COLOR.from_pixel(0x000000ff);
 const PRESSED_BUTTON_BACKGROUND_COLOR = new Clutter.Color();
 PRESSED_BUTTON_BACKGROUND_COLOR.from_pixel(0xccbbaaff);
 
@@ -29,15 +38,42 @@ Panel.prototype = {
         let me = this;
         let global = Shell.Global.get();
 
-        this._box = new Big.Box({ background_color: PANEL_BACKGROUND_COLOR,
+        this._box = new Big.Box({ background_color: TRANSPARENT_COLOR,
                                   x: 0,
                                   y: 0,
-                                  height: PANEL_HEIGHT + 1,
+                                  height: PANEL_HEIGHT,
                                   width: global.screen_width,
                                   orientation: Big.BoxOrientation.HORIZONTAL,
-                                  spacing: 4,
-                                  border_bottom: 1,
-                                  border_color: PANEL_BORDER_COLOR });
+                                  spacing: 4 });
+
+        // Draw the panel background in two parts: the upper and the lower.
+        let back_upper = new Clutter.CairoTexture({ surface_width: 1,
+                                                    surface_height: 2 });
+        back_upper.set_size(global.screen_width, PANEL_HEIGHT / 2);
+        back_upper.set_position(0, 0);
+        Shell.Global.draw_vertical_gradient(back_upper,
+                                            PANEL_TOP_COLOR,
+                                            PANEL_MIDDLE_COLOR);
+        this._box.add_actor(back_upper);
+
+        let back_lower = new Clutter.CairoTexture({ surface_width: 1,
+                                                    surface_height: 2 });
+        back_lower.set_size(global.screen_width, PANEL_HEIGHT / 2);
+        back_lower.set_position(0, PANEL_HEIGHT / 2);
+        Shell.Global.draw_vertical_gradient(back_lower,
+                                            PANEL_MIDDLE_COLOR,
+                                            PANEL_BOTTOM_COLOR);
+        this._box.add_actor(back_lower);
+
+        // Draw the panel's shadow.
+        let shadow = new Clutter.CairoTexture({ surface_width: 1,
+                                                surface_height: 2 });
+        shadow.set_size(global.screen_width, 6);
+        shadow.set_position(0, PANEL_HEIGHT + 1);
+        Shell.Global.draw_vertical_gradient(shadow,
+                                            SHADOW_COLOR,
+                                            TRANSPARENT_COLOR);
+        this._box.add_actor(shadow);
 
         this.button = new Button.Button("Activities", PANEL_BUTTON_COLOR, PRESSED_BUTTON_BACKGROUND_COLOR, true, null, PANEL_HEIGHT);
 
