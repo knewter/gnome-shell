@@ -797,7 +797,7 @@ Workspaces.prototype = {
         // Create a backdrop rectangle, so that you don't see the
         // other parts of the overlay (eg, sidebar) through the gaps
         // between the workspaces when they're zooming in/out
-        this._backdrop = new Clutter.Rectangle({ color: Overlay.OVERLAY_BACKGROUND_COLOR,
+        this._backdrop = new Clutter.Rectangle({ color: Overlay.TRANSPARENT_COLOR,
                                                  x: this._backdropX,
                                                  y: this._backdropY,
                                                  width: this._backdropWidth,

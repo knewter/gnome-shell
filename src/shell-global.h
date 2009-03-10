@@ -64,6 +64,10 @@ void     shell_global_ungrab_keyboard (ShellGlobal *global);
 
 void shell_global_reexec_self (ShellGlobal *global);
 
+void shell_global_draw_vertical_gradient (ClutterCairoTexture *texture,
+					  ClutterColor *top,
+					  ClutterColor *bottom);
+
 G_END_DECLS
 
 #endif /* __SHELL_GLOBAL_H__ */

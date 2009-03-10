@@ -662,3 +662,38 @@ grab_notify (GtkWidget *widget, gboolean was_grabbed, gpointer user_data)
                                           global->input_width, global->input_height);      
     }
 }
+
+/**
+ * shell_global_draw_vertical_gradient
+ * texture: a 1x2 pixel texture actor
+ * top: the color at the top
+ * bottom: the color at the bottom
+ * 
+ * Draws two pixels with the top and bottom colors.  The texture can be
+ * stretched to create a gradent effect.
+ */
+void
+shell_global_draw_vertical_gradient (ClutterCairoTexture *texture,
+                                     ClutterColor *top,
+                                     ClutterColor *bottom)
+{
+  cairo_t *cr = clutter_cairo_texture_create (CLUTTER_CAIRO_TEXTURE (texture));
+
+  cairo_set_source_rgba (cr,
+                         top->red / 255.,
+                         top->green / 255.,
+                         top->blue / 255.,
+                         top->alpha / 255.);
+  cairo_rectangle (cr, 0, 0, 1, 1);
+  cairo_fill (cr);
+
+  cairo_set_source_rgba (cr,
+                         bottom->red / 255.,
+                         bottom->green / 255.,
+                         bottom->blue / 255.,
+                         bottom->alpha / 255.);
+  cairo_rectangle (cr, 0, 1, 1, 1);
+  cairo_fill (cr);
+
+  cairo_destroy (cr);
+}

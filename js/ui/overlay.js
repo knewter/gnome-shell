@@ -17,8 +17,13 @@ const Panel = imports.ui.panel;
 const Tweener = imports.ui.tweener;
 const Workspaces = imports.ui.workspaces;
 
-const OVERLAY_BACKGROUND_COLOR = new Clutter.Color();
-OVERLAY_BACKGROUND_COLOR.from_pixel(0x000000ff);
+const OVERLAY_BACKGROUND_TOP_COLOR = new Clutter.Color();
+OVERLAY_BACKGROUND_TOP_COLOR.from_pixel(0x242424ff);
+const OVERLAY_BACKGROUND_BOTTOM_COLOR = new Clutter.Color();
+OVERLAY_BACKGROUND_BOTTOM_COLOR.from_pixel(0x070707ff);
+
+const TRANSPARENT_COLOR = new Clutter.Color();
+TRANSPARENT_COLOR.from_pixel(0x00000000);
 
 const LABEL_HEIGHT = 16;
 // We use SIDESHOW_PAD for the padding on the left side of the sideshow and as a gap
@@ -185,7 +190,7 @@ Sideshow.prototype = {
             return false;
         });
 
-        this._appsSection = new Big.Box({ background_color: OVERLAY_BACKGROUND_COLOR,
+        this._appsSection = new Big.Box({ background_color: TRANSPARENT_COLOR,
                                           x: SIDESHOW_PAD,
                                           y: this._searchBox.y + this._searchBox.height,
                                           padding_top: SIDESHOW_SECTION_PADDING_TOP,
@@ -220,7 +225,7 @@ Sideshow.prototype = {
         this._appsDisplayControlBox = new Big.Box({x_align: Big.BoxAlignment.CENTER});
         this._appsDisplayControlBox.append(this._appDisplay.displayControl, Big.BoxPackFlags.NONE);
 
-        this._docsSection = new Big.Box({ background_color: OVERLAY_BACKGROUND_COLOR,
+        this._docsSection = new Big.Box({ background_color: TRANSPARENT_COLOR,
                                           x: SIDESHOW_PAD,
                                           y: this._appsSection.y + this._appsSection.height,
                                           padding_top: SIDESHOW_SECTION_PADDING_TOP,
@@ -570,12 +575,18 @@ Overlay.prototype = {
         this._group = new Clutter.Group();
         this.visible = false;
 
-        let background = new Clutter.Rectangle({ color: OVERLAY_BACKGROUND_COLOR,
-                                                 reactive: true,
-                                                 x: 0,
-                                                 y: Panel.PANEL_HEIGHT,
-                                                 width: global.screen_width,
-                                                 height: global.screen_width - Panel.PANEL_HEIGHT });
+        // The vertical background gradient is drawn using a 1x2 texture
+        // containing 2 pixels, scaled up so that the overlay screen occupies
+        // the rectangle between (0, 0.25) and (1, 0.75).
+        let background = new Clutter.CairoTexture({ surface_width: 1,
+                                                    surface_height: 2 });
+        background.set_size(global.screen_width,
+                            2 * (global.screen_height - Panel.PANEL_HEIGHT));
+        background.set_position(0, 0.5 * (Panel.PANEL_HEIGHT
+                                          - global.screen_height));
+        Shell.Global.draw_vertical_gradient(background,
+                                            OVERLAY_BACKGROUND_TOP_COLOR,
+                                            OVERLAY_BACKGROUND_BOTTOM_COLOR);
         this._group.add_actor(background);
 
         this._group.hide();
@@ -652,7 +663,7 @@ Overlay.prototype = {
         // the workspaces out to uncover the expanded items display and also when we are sliding the
         // workspaces back in to gradually cover the expanded items display. If we don't have such background,
         // we get a few items above or below the workspaces display that disappear or appear abruptly.  
-        this._workspacesBackground = new Clutter.Rectangle({ color: OVERLAY_BACKGROUND_COLOR,
+        this._workspacesBackground = new Clutter.Rectangle({ color: TRANSPARENT_COLOR,
                                                              reactive: false,
                                                              x: displayGridColumnWidth,
                                                              y: Panel.PANEL_HEIGHT,
