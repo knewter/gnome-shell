@@ -11,12 +11,24 @@ const Main = imports.ui.main;
 
 const PANEL_HEIGHT = 32;
 const TRAY_HEIGHT = 24;
+const SHADOW_HEIGHT = 6;
+
 const PANEL_BACKGROUND_COLOR = new Clutter.Color();
 PANEL_BACKGROUND_COLOR.from_pixel(0xeeddccff);
+
+const PANEL_TOP_COLOR = new Clutter.Color();
+PANEL_TOP_COLOR.from_pixel(0xffffff99);
+const PANEL_MIDDLE_COLOR = new Clutter.Color();
+PANEL_MIDDLE_COLOR.from_pixel(0xffffff88);
+const PANEL_BOTTOM_COLOR = new Clutter.Color();
+PANEL_BOTTOM_COLOR.from_pixel(0xffffffaa);
+const SHADOW_COLOR = new Clutter.Color();
+SHADOW_COLOR.from_pixel(0x00000033);
+const TRANSPARENT_COLOR = new Clutter.Color();
+TRANSPARENT_COLOR.from_pixel(0x00000000);
+
 const PANEL_BUTTON_COLOR = new Clutter.Color();
 PANEL_BUTTON_COLOR.from_pixel(0xccbbaa66);
-const PANEL_BORDER_COLOR = new Clutter.Color();
-PANEL_BORDER_COLOR.from_pixel(0x000000ff);
 const PRESSED_BUTTON_BACKGROUND_COLOR = new Clutter.Color();
 PRESSED_BUTTON_BACKGROUND_COLOR.from_pixel(0xccbbaaff);
 
@@ -29,15 +41,34 @@ Panel.prototype = {
         let me = this;
         let global = Shell.Global.get();
 
-        this._box = new Big.Box({ background_color: PANEL_BACKGROUND_COLOR,
+        // Put the background under the panel within a group.
+        let group = new Clutter.Group();
+
+        // Create a box with the background and the shadow.
+        let backBox = new Big.Box({ orientation: Big.BoxOrientation.VERTICAL,
+                                    x: 0,
+                                    y: 0,
+                                    width: global.screen_width,
+                                    height: PANEL_HEIGHT + SHADOW_HEIGHT });
+        let backUpper = global.create_vertical_gradient(PANEL_TOP_COLOR,
+                                                        PANEL_MIDDLE_COLOR);
+        let backLower = global.create_vertical_gradient(PANEL_MIDDLE_COLOR,
+                                                        PANEL_BOTTOM_COLOR);
+        let shadow    = global.create_vertical_gradient(SHADOW_COLOR,
+                                                        TRANSPARENT_COLOR);
+        shadow.set_height(SHADOW_HEIGHT);
+        backBox.append(backUpper, Big.BoxPackFlags.EXPAND);
+        backBox.append(backLower, Big.BoxPackFlags.EXPAND);
+        backBox.append(shadow,    Big.BoxPackFlags.NONE);
+        group.add_actor(backBox);
+
+        this._box = new Big.Box({ background_color: TRANSPARENT_COLOR,
                                   x: 0,
                                   y: 0,
-                                  height: PANEL_HEIGHT + 1,
+                                  height: PANEL_HEIGHT,
                                   width: global.screen_width,
                                   orientation: Big.BoxOrientation.HORIZONTAL,
-                                  spacing: 4,
-                                  border_bottom: 1,
-                                  border_color: PANEL_BORDER_COLOR });
+                                  spacing: 4 });
 
         this.button = new Button.Button("Activities", PANEL_BUTTON_COLOR, PRESSED_BUTTON_BACKGROUND_COLOR, true, null, PANEL_HEIGHT);
 
@@ -102,7 +133,9 @@ Panel.prototype = {
                 me._setStruts();
             });
 
-        global.stage.add_actor(this._box);
+        group.add_actor(this._box);
+
+        global.stage.add_actor(group);
 
         // Start the clock
         this._updateClock();
