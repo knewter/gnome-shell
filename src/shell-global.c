@@ -662,3 +662,45 @@ grab_notify (GtkWidget *widget, gboolean was_grabbed, gpointer user_data)
                                           global->input_width, global->input_height);      
     }
 }
+
+/**
+ * shell_global_create_vertical_gradient:
+ * @top: the color at the top
+ * @bottom: the color at the bottom
+ *
+ * Creates a vertical gradient actor.
+ *
+ * Returns: (transfer none): a #ClutterCairoTexture actor with the gradient
+ */
+ClutterCairoTexture *
+shell_global_create_vertical_gradient (ClutterColor *top,
+                                       ClutterColor *bottom)
+{
+  ClutterCairoTexture *texture;
+  cairo_t *cr;
+  cairo_pattern_t *pattern;
+
+  /* Draw the gradient on an 8x8 px texture. */
+  texture = CLUTTER_CAIRO_TEXTURE (clutter_cairo_texture_new (8, 8));
+  cr = clutter_cairo_texture_create (texture);
+
+  pattern = cairo_pattern_create_linear (0, 0, 0, 8);
+  cairo_pattern_add_color_stop_rgba (pattern, 0,
+                                     top->red / 255.,
+                                     top->green / 255.,
+                                     top->blue / 255.,
+                                     top->alpha / 255.);
+  cairo_pattern_add_color_stop_rgba (pattern, 1,
+                                     bottom->red / 255.,
+                                     bottom->green / 255.,
+                                     bottom->blue / 255.,
+                                     bottom->alpha / 255.);
+
+  cairo_set_source (cr, pattern);
+  cairo_rectangle (cr, 0, 0, 8, 8);
+  cairo_fill (cr);
+
+  cairo_destroy (cr);
+
+  return texture;
+}
