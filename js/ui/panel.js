@@ -113,6 +113,7 @@ Panel.prototype = {
                                           padding_bottom: trayPad });
         this._box.append(trayContainer, Big.BoxPackFlags.END);
         let trayBox = new Big.Box({ orientation: Big.BoxOrientation.HORIZONTAL,
+                                    height: TRAY_HEIGHT,
                                     background_color: TRAY_BACKGROUND_COLOR,
                                     corner_radius: TRAY_CORNER_RADIUS,
                                     border: TRAY_BORDER_WIDTH,
