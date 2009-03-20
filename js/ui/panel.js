@@ -13,24 +13,31 @@ const PANEL_HEIGHT = 32;
 const TRAY_HEIGHT = 24;
 const SHADOW_HEIGHT = 6;
 
-const PANEL_BACKGROUND_COLOR = new Clutter.Color();
-PANEL_BACKGROUND_COLOR.from_pixel(0xeeddccff);
-
+// The panel has a transparent white background with a gradient.
 const PANEL_TOP_COLOR = new Clutter.Color();
 PANEL_TOP_COLOR.from_pixel(0xffffff99);
 const PANEL_MIDDLE_COLOR = new Clutter.Color();
 PANEL_MIDDLE_COLOR.from_pixel(0xffffff88);
 const PANEL_BOTTOM_COLOR = new Clutter.Color();
 PANEL_BOTTOM_COLOR.from_pixel(0xffffffaa);
+
 const SHADOW_COLOR = new Clutter.Color();
 SHADOW_COLOR.from_pixel(0x00000033);
 const TRANSPARENT_COLOR = new Clutter.Color();
 TRANSPARENT_COLOR.from_pixel(0x00000000);
 
+// Darken (pressed) buttons; lightening has no effect on white backgrounds.
 const PANEL_BUTTON_COLOR = new Clutter.Color();
-PANEL_BUTTON_COLOR.from_pixel(0xccbbaa66);
+PANEL_BUTTON_COLOR.from_pixel(0x00000015);
 const PRESSED_BUTTON_BACKGROUND_COLOR = new Clutter.Color();
-PRESSED_BUTTON_BACKGROUND_COLOR.from_pixel(0xccbbaaff);
+PRESSED_BUTTON_BACKGROUND_COLOR.from_pixel(0x00000030);
+
+const TRAY_BACKGROUND_COLOR = new Clutter.Color();
+TRAY_BACKGROUND_COLOR.from_pixel(0xefefefff);
+const TRAY_BORDER_COLOR = new Clutter.Color();
+TRAY_BORDER_COLOR.from_pixel(0x00000033);
+const TRAY_CORNER_RADIUS = 5;
+const TRAY_BORDER_WIDTH = 1;
 
 function Panel() {
     this._init();
@@ -94,22 +101,34 @@ Panel.prototype = {
         let pad = (PANEL_HEIGHT - this._clock.height) / 2;
         let clockbox = new Big.Box({ padding_top: pad,
                                      padding_bottom: pad,
+                                     padding_left: 4,
                                      padding_right: 4 });
         clockbox.append(this._clock, Big.BoxPackFlags.NONE);
         this._box.append(clockbox, Big.BoxPackFlags.END);
 
-        this._traymanager = new Shell.TrayManager({ bg_color: PANEL_BACKGROUND_COLOR });
+        // The tray icons live in trayBox within trayContainer.
+        // With Gtk 2.16, we can also use a transparent background for this.
+        let trayPad = (PANEL_HEIGHT - TRAY_HEIGHT - 2 * TRAY_BORDER_WIDTH) / 2;
+        let trayContainer = new Big.Box({ padding_top: trayPad,
+                                          padding_bottom: trayPad });
+        this._box.append(trayContainer, Big.BoxPackFlags.END);
+        let trayBox = new Big.Box({ orientation: Big.BoxOrientation.HORIZONTAL,
+                                    background_color: TRAY_BACKGROUND_COLOR,
+                                    corner_radius: TRAY_CORNER_RADIUS,
+                                    border: TRAY_BORDER_WIDTH,
+                                    border_color: TRAY_BORDER_COLOR,
+                                    padding_left: TRAY_CORNER_RADIUS,
+                                    padding_right: TRAY_CORNER_RADIUS });
+        trayContainer.append(trayBox, Big.BoxPackFlags.NONE);
+
+        this._traymanager = new Shell.TrayManager({ bg_color: TRAY_BACKGROUND_COLOR });
         this._traymanager.connect('tray-icon-added',
             function(o, icon) {
-                let pad = (PANEL_HEIGHT - icon.height) / 2;
-                icon._panel_box = new Big.Box({ padding_top: pad,
-                                                padding_bottom: pad });
-                icon._panel_box.append(icon, Big.BoxPackFlags.NONE);
-                me._box.append(icon._panel_box, Big.BoxPackFlags.END);
+                trayBox.append(icon, Big.BoxPackFlags.NONE);
             });
         this._traymanager.connect('tray-icon-removed',
             function(o, icon) {
-                me._box.remove_actor(icon._panel_box);
+                trayBox.remove_actor(icon);
             });
         this._traymanager.manage_stage(global.stage);
 
