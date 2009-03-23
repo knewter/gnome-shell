@@ -63,12 +63,12 @@ Panel.prototype = {
                                                         PANEL_MIDDLE_COLOR);
         let backLower = global.create_vertical_gradient(PANEL_MIDDLE_COLOR,
                                                         PANEL_BOTTOM_COLOR);
-        let shadow    = global.create_vertical_gradient(SHADOW_COLOR,
-                                                        TRANSPARENT_COLOR);
+        let shadow = global.create_vertical_gradient(SHADOW_COLOR,
+                                                     TRANSPARENT_COLOR);
         shadow.set_height(SHADOW_HEIGHT);
         backBox.append(backUpper, Big.BoxPackFlags.EXPAND);
         backBox.append(backLower, Big.BoxPackFlags.EXPAND);
-        backBox.append(shadow,    Big.BoxPackFlags.NONE);
+        backBox.append(shadow, Big.BoxPackFlags.NONE);
         group.add_actor(backBox);
 
         this._box = new Big.Box({ background_color: TRANSPARENT_COLOR,
