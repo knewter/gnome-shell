@@ -53,7 +53,11 @@ Panel.prototype = {
         // Put the background under the panel within a group.
         let group = new Clutter.Group();
 
-        // Create a box with the background and the shadow.
+        // Create backBox, which contains two boxes, backUpper and backLower,
+        // for the background gradients and one for the shadow. The shadow at
+        // the bottom has a fixed height (packing flag NONE), and the rest of
+        // the height above is divided evenly between backUpper and backLower
+        // (with packing flag EXPAND).
         let backBox = new Big.Box({ orientation: Big.BoxOrientation.VERTICAL,
                                     x: 0,
                                     y: 0,
