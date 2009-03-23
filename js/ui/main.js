@@ -20,6 +20,7 @@ let overlay = null;
 let overlayActive = false;
 let runDialog = null;
 let wm = null;
+let recorder = null;
 
 function start() {
     let global = Shell.Global.get();
@@ -58,7 +59,6 @@ function start() {
     });
 
     panel = new Panel.Panel();
-    global.set_stage_input_area(0, 0, global.screen_width, Panel.PANEL_HEIGHT);
 
     overlay = new Overlay.Overlay();
     wm = new WindowManager.WindowManager();
@@ -71,6 +71,24 @@ function start() {
             show_overlay();
         }
     };
+
+    global.screen.connect('toggle-recording', function() {
+        if (recorder == null) {
+            // We have to initialize GStreamer first. This isn't done
+            // inside ShellRecorder to make it usable inside projects
+            // with other usage of GStreamer.
+            let Gst = imports.gi.Gst;
+            Gst.init(null, null);
+            recorder = new Shell.Recorder({ stage: global.stage });
+        }
+
+        if (recorder.is_recording()) {
+            recorder.pause();
+        } else {
+            recorder.record();
+        }
+    });
+
     display.connect('overlay-key', toggleOverlay);
     global.connect('panel-main-menu', toggleOverlay);
     
@@ -125,7 +143,7 @@ function endModal() {
     let global = Shell.Global.get();
 
     global.ungrab_keyboard();
-    global.set_stage_input_area(0, 0, global.screen_width, Panel.PANEL_HEIGHT);
+    panel.set_stage_input_area();
 }
 
 function show_overlay() {
