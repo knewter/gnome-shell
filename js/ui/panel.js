@@ -10,7 +10,7 @@ const Button = imports.ui.button;
 const Main = imports.ui.main;
 
 const PANEL_HEIGHT = 32;
-const TRAY_HEIGHT = 24;
+const TRAY_HEIGHT = 28;
 const SHADOW_HEIGHT = 6;
 
 // The panel has a transparent white background with a gradient.
@@ -38,6 +38,8 @@ const TRAY_BORDER_COLOR = new Clutter.Color();
 TRAY_BORDER_COLOR.from_pixel(0x00000033);
 const TRAY_CORNER_RADIUS = 5;
 const TRAY_BORDER_WIDTH = 1;
+const TRAY_PADDING = 2;
+const TRAY_SPACING = 2;
 
 function Panel() {
     this._init();
@@ -109,9 +111,8 @@ Panel.prototype = {
         // The tray icons live in trayBox within trayContainer.
         // With Gtk 2.16, we can also use a transparent background for this.
         // The trayBox is hidden when there are no tray icons.
-        let trayPad = (PANEL_HEIGHT - TRAY_HEIGHT - 2 * TRAY_BORDER_WIDTH) / 2;
-        let trayContainer = new Big.Box({ padding_top: trayPad,
-                                          padding_bottom: trayPad });
+        let trayContainer = new Big.Box({ orientation: Big.BoxOrientation.VERTICAL,
+                                          y_align: Big.BoxAlignment.CENTER });
         this._box.append(trayContainer, Big.BoxPackFlags.END);
         let trayBox = new Big.Box({ orientation: Big.BoxOrientation.HORIZONTAL,
                                     height: TRAY_HEIGHT,
@@ -119,8 +120,8 @@ Panel.prototype = {
                                     corner_radius: TRAY_CORNER_RADIUS,
                                     border: TRAY_BORDER_WIDTH,
                                     border_color: TRAY_BORDER_COLOR,
-                                    padding_left: TRAY_CORNER_RADIUS,
-                                    padding_right: TRAY_CORNER_RADIUS });
+                                    padding: TRAY_PADDING,
+                                    spacing: TRAY_SPACING });
         trayBox.hide();
         trayContainer.append(trayBox, Big.BoxPackFlags.NONE);
 
