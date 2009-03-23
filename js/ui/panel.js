@@ -51,7 +51,7 @@ Panel.prototype = {
         let global = Shell.Global.get();
 
         // Put the background under the panel within a group.
-        let group = new Clutter.Group();
+        this._group = new Clutter.Group();
 
         // Create backBox, which contains two boxes, backUpper and backLower,
         // for the background gradients and one for the shadow. The shadow at
@@ -73,19 +73,19 @@ Panel.prototype = {
         backBox.append(backUpper, Big.BoxPackFlags.EXPAND);
         backBox.append(backLower, Big.BoxPackFlags.EXPAND);
         backBox.append(shadow, Big.BoxPackFlags.NONE);
-        group.add_actor(backBox);
+        this._group.add_actor(backBox);
 
-        this._box = new Big.Box({ background_color: TRANSPARENT_COLOR,
-                                  x: 0,
-                                  y: 0,
-                                  height: PANEL_HEIGHT,
-                                  width: global.screen_width,
-                                  orientation: Big.BoxOrientation.HORIZONTAL,
-                                  spacing: 4 });
+        let box = new Big.Box({ background_color: TRANSPARENT_COLOR,
+                                x: 0,
+                                y: 0,
+                                height: PANEL_HEIGHT,
+                                width: global.screen_width,
+                                orientation: Big.BoxOrientation.HORIZONTAL,
+                                spacing: 4 });
 
         this.button = new Button.Button("Activities", PANEL_BUTTON_COLOR, PRESSED_BUTTON_BACKGROUND_COLOR, true, null, PANEL_HEIGHT);
 
-        this._box.append(this.button.button, Big.BoxPackFlags.NONE);
+        box.append(this.button.button, Big.BoxPackFlags.NONE);
 
         let statusbox = new Big.Box();
         this._statusmenu = new Shell.StatusMenu();
@@ -96,7 +96,7 @@ Panel.prototype = {
             me._statusmenu.toggle(e);
             return false;
         });
-        this._box.append(statusbutton.button, Big.BoxPackFlags.END);
+        box.append(statusbutton.button, Big.BoxPackFlags.END);
         // We get a deactivated event when the popup disappears
         this._statusmenu.connect('deactivated', function (sm) {
             statusbutton.release();
@@ -110,14 +110,14 @@ Panel.prototype = {
                                      padding_left: 4,
                                      padding_right: 4 });
         clockbox.append(this._clock, Big.BoxPackFlags.NONE);
-        this._box.append(clockbox, Big.BoxPackFlags.END);
+        box.append(clockbox, Big.BoxPackFlags.END);
 
         // The tray icons live in trayBox within trayContainer.
         // With Gtk 2.16, we can also use a transparent background for this.
         // The trayBox is hidden when there are no tray icons.
         let trayContainer = new Big.Box({ orientation: Big.BoxOrientation.VERTICAL,
                                           y_align: Big.BoxAlignment.CENTER });
-        this._box.append(trayContainer, Big.BoxPackFlags.END);
+        box.append(trayContainer, Big.BoxPackFlags.END);
         let trayBox = new Big.Box({ orientation: Big.BoxOrientation.HORIZONTAL,
                                     height: TRAY_HEIGHT,
                                     background_color: TRAY_BACKGROUND_COLOR,
@@ -166,9 +166,9 @@ Panel.prototype = {
                 me._setStruts();
             });
 
-        group.add_actor(this._box);
+        this._group.add_actor(box);
 
-        global.stage.add_actor(group);
+        global.stage.add_actor(this._group);
 
         global.screen.connect('restacked',
             function() {
@@ -183,9 +183,9 @@ Panel.prototype = {
     set_stage_input_area: function() {
         let global = Shell.Global.get();
 
-        if (this._box.visible) {
-            global.set_stage_input_area(this._box.x, this._box.y,
-                                        this._box.width, this._box.height);
+        if (this._group.visible) {
+            global.set_stage_input_area(this._group.x, this._group.y,
+                                        this._group.width, PANEL_HEIGHT);
         } else
             global.set_stage_input_area(0, 0, 0, 0);
     },
@@ -228,20 +228,20 @@ Panel.prototype = {
         // treats it currently...
         //
         // @windows is sorted bottom to top.
-        this._box.show();
+        this._group.show();
         for (i = windows.length - 1; i > -1; i--) {
             let layer = windows[i].get_meta_window().get_layer();
 
             if (layer == Meta.StackLayer.OVERRIDE_REDIRECT) {
-                if (windows[i].x <= this._box.x &&
-                    windows[i].x + windows[i].width >= this._box.x + this._box.width &&
-                    windows[i].y <= this._box.y &&
-                    windows[i].y + windows[i].height >= this._box.y + this._box.height) {
-                    this._box.hide();
+                if (windows[i].x <= this._group.x &&
+                    windows[i].x + windows[i].width >= this._group.x + this._group.width &&
+                    windows[i].y <= this._group.y &&
+                    windows[i].y + windows[i].height >= this._group.y + PANEL_HEIGHT) {
+                    this._group.hide();
                     break;
                 }
             } else if (layer == Meta.StackLayer.FULLSCREEN) {
-                this._box.hide();
+                this._group.hide();
                 break;
             } else
                 break;
