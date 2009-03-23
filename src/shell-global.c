@@ -697,9 +697,9 @@ shell_global_create_vertical_gradient (ClutterColor *top,
                                      bottom->alpha / 255.);
 
   cairo_set_source (cr, pattern);
-  cairo_rectangle (cr, 0, 0, 8, 8);
-  cairo_fill (cr);
+  cairo_paint (cr);
 
+  cairo_pattern_destroy (pattern);
   cairo_destroy (cr);
 
   return texture;
