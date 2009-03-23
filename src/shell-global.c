@@ -680,7 +680,11 @@ shell_global_create_vertical_gradient (ClutterColor *top,
   cairo_t *cr;
   cairo_pattern_t *pattern;
 
-  /* Draw the gradient on an 8x8 px texture. */
+  /* Draw the gradient on an 8x8 pixel texture. Because the gradient is drawn
+   * from the uppermost to the lowermost row, after stretching 1/16 of the
+   * texture height has the top color and 1/16 has the bottom color. The 8
+   * pixel width is chosen for reasons related to graphics hardware internals.
+   */
   texture = CLUTTER_CAIRO_TEXTURE (clutter_cairo_texture_new (8, 8));
   cr = clutter_cairo_texture_create (texture);
 
@@ -702,5 +706,6 @@ shell_global_create_vertical_gradient (ClutterColor *top,
   cairo_pattern_destroy (pattern);
   cairo_destroy (cr);
 
+  /* The texture actor is floating, hence (transfer none). */
   return texture;
 }
