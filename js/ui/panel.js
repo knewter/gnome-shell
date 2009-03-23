@@ -108,6 +108,7 @@ Panel.prototype = {
 
         // The tray icons live in trayBox within trayContainer.
         // With Gtk 2.16, we can also use a transparent background for this.
+        // The trayBox is hidden when there are no tray icons.
         let trayPad = (PANEL_HEIGHT - TRAY_HEIGHT - 2 * TRAY_BORDER_WIDTH) / 2;
         let trayContainer = new Big.Box({ padding_top: trayPad,
                                           padding_bottom: trayPad });
@@ -120,16 +121,23 @@ Panel.prototype = {
                                     border_color: TRAY_BORDER_COLOR,
                                     padding_left: TRAY_CORNER_RADIUS,
                                     padding_right: TRAY_CORNER_RADIUS });
+        trayBox.hide();
         trayContainer.append(trayBox, Big.BoxPackFlags.NONE);
 
         this._traymanager = new Shell.TrayManager({ bg_color: TRAY_BACKGROUND_COLOR });
         this._traymanager.connect('tray-icon-added',
             function(o, icon) {
                 trayBox.append(icon, Big.BoxPackFlags.NONE);
+
+                // Make sure the trayBox is shown.
+                trayBox.show();
             });
         this._traymanager.connect('tray-icon-removed',
             function(o, icon) {
                 trayBox.remove_actor(icon);
+
+                if (trayBox.get_children().length == 0)
+                    trayBox.hide();
             });
         this._traymanager.manage_stage(global.stage);
 
