@@ -75,8 +75,7 @@ Panel.prototype = {
         backBox.append(shadow, Big.BoxPackFlags.NONE);
         this._group.add_actor(backBox);
 
-        let box = new Big.Box({ background_color: TRANSPARENT_COLOR,
-                                x: 0,
+        let box = new Big.Box({ x: 0,
                                 y: 0,
                                 height: PANEL_HEIGHT,
                                 width: global.screen_width,
