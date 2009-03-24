@@ -671,7 +671,7 @@ grab_notify (GtkWidget *widget, gboolean was_grabbed, gpointer user_data)
  * Creates a vertical gradient actor.
  *
  * Return value: (transfer none): a #ClutterCairoTexture actor with the
- *     gradient. The texture actor is floating, hence (transfer none).
+ *               gradient. The texture actor is floating, hence (transfer none).
  */
 ClutterCairoTexture *
 shell_global_create_vertical_gradient (ClutterColor *top,
