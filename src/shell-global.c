@@ -4,7 +4,9 @@
 #include "shell-wm.h"
 
 #include "display.h"
+#include <clutter/glx/clutter-glx.h>
 #include <clutter/x11/clutter-x11.h>
+#include <gdk/gdkx.h>
 #include <unistd.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -727,4 +729,45 @@ shell_global_create_vertical_gradient (ClutterColor *top,
   cairo_destroy (cr);
 
   return texture;
+}
+
+/**
+ * shell_global_create_root_pixmap_actor:
+ * @global: a #ShellGlobal
+ *
+ * Creates an actor showing the root pixmap.
+ *
+ * Return value: (transfer none): a #ClutterActor with the root window pixmap
+ */
+ClutterActor *
+shell_global_create_root_pixmap_actor (ShellGlobal *global)
+{
+  GdkScreen *screen = gdk_screen_get_default ();
+  GdkWindow *window = gdk_screen_get_root_window (screen);
+  GdkDisplay *display = gdk_drawable_get_display (window);
+  Atom native_atom = gdk_x11_get_xatom_by_name_for_display (display,
+                                                            "_XROOTPMAP_ID");
+  GdkAtom atom = gdk_x11_xatom_to_atom_for_display (display, native_atom);
+  GdkAtom prop_type;
+  int prop_size;
+  XID *pixmaps = NULL;
+  ClutterActor *actor;
+  
+  if (gdk_property_get(window, atom, GDK_TARGET_PIXMAP,
+                       0, INT_MAX - 3,
+                       FALSE,
+                       &prop_type, NULL, &prop_size,
+                       (guchar**)&pixmaps) &&
+      (prop_type == GDK_TARGET_PIXMAP) &&
+      (prop_size >= (int)sizeof(XID)) &&
+      (pixmaps != NULL))
+    {
+      actor = clutter_glx_texture_pixmap_new_with_pixmap (pixmaps[0]);
+    }
+  else
+    {
+      actor = clutter_rectangle_new ();
+    }
+
+  return actor;
 }

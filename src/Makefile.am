@@ -119,6 +119,7 @@ libgnome_shell_la_LDFLAGS = -avoid-version -module
 libgnome_shell_la_LIBADD =	\
 	$(MUTTER_PLUGIN_LIBS)	\
         $(LIBGNOMEUI_LIBS)      \
+        $(X11_LIBS)             \
 	libbig-1.0.la		\
 	libgdmuser-1.0.la	\
 	libtidy-1.0.la		\

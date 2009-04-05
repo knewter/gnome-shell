@@ -19,6 +19,8 @@ const Workspaces = imports.ui.workspaces;
 
 const OVERLAY_BACKGROUND_COLOR = new Clutter.Color();
 OVERLAY_BACKGROUND_COLOR.from_pixel(0x000000ff);
+const TRANSPARENT_COLOR = new Clutter.Color();
+TRANSPARENT_COLOR.from_pixel(0x00000000);
 
 const LABEL_HEIGHT = 16;
 // We use SIDESHOW_PAD for the padding on the left side of the sideshow and as a gap
@@ -202,8 +204,7 @@ Sideshow.prototype = {
             return false;
         });
 
-        this._appsSection = new Big.Box({ background_color: OVERLAY_BACKGROUND_COLOR,
-                                          x: SIDESHOW_PAD,
+        this._appsSection = new Big.Box({ x: SIDESHOW_PAD,
                                           y: this._searchBox.y + this._searchBox.height,
                                           padding_top: SIDESHOW_SECTION_PADDING_TOP,
                                           spacing: SIDESHOW_SECTION_SPACING});
@@ -237,8 +238,7 @@ Sideshow.prototype = {
         this._appsDisplayControlBox = new Big.Box({x_align: Big.BoxAlignment.CENTER});
         this._appsDisplayControlBox.append(this._appDisplay.displayControl, Big.BoxPackFlags.NONE);
 
-        this._docsSection = new Big.Box({ background_color: OVERLAY_BACKGROUND_COLOR,
-                                          x: SIDESHOW_PAD,
+        this._docsSection = new Big.Box({ x: SIDESHOW_PAD,
                                           y: this._appsSection.y + this._appsSection.height,
                                           padding_top: SIDESHOW_SECTION_PADDING_TOP,
                                           spacing: SIDESHOW_SECTION_SPACING});
@@ -624,13 +624,17 @@ Overlay.prototype = {
         this.visible = false;
         this._hideInProgress = false;
 
-        let background = new Clutter.Rectangle({ color: OVERLAY_BACKGROUND_COLOR,
-                                                 reactive: true,
-                                                 x: 0,
-                                                 y: 0,
-                                                 width: global.screen_width,
-                                                 height: global.screen_width });
+        let background = global.create_root_pixmap_actor();
+        background.width = global.screen_width * 3;
+        background.height = global.screen_height * 3;
         this._group.add_actor(background);
+
+        let overColor = new Clutter.Color();
+        overColor.from_pixel(0x000000cc);
+        let backOver = new Clutter.Rectangle({ color: overColor,
+                                               width: global.screen_width,
+                                               height: global.screen_height });
+        this._group.add_actor(backOver);
 
         this._group.hide();
         global.overlay_group.add_actor(this._group);
@@ -734,7 +738,7 @@ Overlay.prototype = {
         // the workspaces out to uncover the expanded items display and also when we are sliding the
         // workspaces back in to gradually cover the expanded items display. If we don't have such background,
         // we get a few items above or below the workspaces display that disappear or appear abruptly.  
-        this._workspacesBackground = new Clutter.Rectangle({ color: OVERLAY_BACKGROUND_COLOR,
+        this._workspacesBackground = new Clutter.Rectangle({ color: TRANSPARENT_COLOR,
                                                              reactive: false,
                                                              x: displayGridColumnWidth,
                                                              y: Panel.PANEL_HEIGHT,
