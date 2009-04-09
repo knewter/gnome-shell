@@ -44,7 +44,7 @@ PKG_CHECK_MODULES(BIG, clutter-0.9 gtk+-2.0 librsvg-2.0)
 PKG_CHECK_MODULES(GDMUSER, dbus-glib-1 gtk+-2.0)
 PKG_CHECK_MODULES(TRAY, gtk+-2.0)
 PKG_CHECK_MODULES(TASKPANEL, libwnck-1.0 dbus-glib-1)
-PKG_CHECK_MODULES(X11, gdk-x11-2.0)
+PKG_CHECK_MODULES(X11, gdk-x11-2.0 clutter-x11-0.9 clutter-glx-0.9)
 # We require libgnomeui for generating thumbnails for recent files with GnomeThumbnailFactory.
 # We'll switch to using GnomeDesktopThumbnailFactory once the branch of gnome-desktop that contains
 # it becomes stable.

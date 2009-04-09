@@ -17,10 +17,10 @@ const Panel = imports.ui.panel;
 const Tweener = imports.ui.tweener;
 const Workspaces = imports.ui.workspaces;
 
-const OVERLAY_BACKGROUND_COLOR = new Clutter.Color();
-OVERLAY_BACKGROUND_COLOR.from_pixel(0x000000ff);
 const TRANSPARENT_COLOR = new Clutter.Color();
 TRANSPARENT_COLOR.from_pixel(0x00000000);
+const ROOT_OVERLAY_COLOR = new Clutter.Color();
+ROOT_OVERLAY_COLOR.from_pixel(0x000000cc);
 
 const LABEL_HEIGHT = 16;
 // We use SIDESHOW_PAD for the padding on the left side of the sideshow and as a gap
@@ -673,9 +673,7 @@ Overlay.prototype = {
         background.height = global.screen_height * 2;
         this._group.add_actor(background);
 
-        let overColor = new Clutter.Color();
-        overColor.from_pixel(0x000000cc);
-        let backOver = new Clutter.Rectangle({ color: overColor,
+        let backOver = new Clutter.Rectangle({ color: ROOT_OVERLAY_COLOR,
                                                width: global.screen_width,
                                                height: global.screen_height });
         this._group.add_actor(backOver);
