@@ -762,7 +762,12 @@ shell_global_create_root_pixmap_actor (ShellGlobal *global)
       (prop_size >= (int)sizeof(XID)) &&
       (pixmaps != NULL))
     {
-      actor = clutter_glx_texture_pixmap_new_with_pixmap (pixmaps[0]);
+      //actor = clutter_glx_texture_pixmap_new_with_pixmap (pixmaps[0]);
+      actor = clutter_glx_texture_pixmap_new ();
+      clutter_texture_set_filter_quality (CLUTTER_TEXTURE (actor),
+                                          CLUTTER_TEXTURE_QUALITY_HIGH);
+      clutter_x11_texture_pixmap_set_pixmap (CLUTTER_X11_TEXTURE_PIXMAP (actor),
+                                             pixmaps[0]);
     }
   else
     {

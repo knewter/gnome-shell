@@ -669,8 +669,8 @@ Overlay.prototype = {
         this._hideInProgress = false;
 
         let background = global.create_root_pixmap_actor();
-        background.width = global.screen_width * 3;
-        background.height = global.screen_height * 3;
+        background.width = global.screen_width * 2;
+        background.height = global.screen_height * 2;
         this._group.add_actor(background);
 
         let overColor = new Clutter.Color();
