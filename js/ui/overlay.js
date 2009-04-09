@@ -227,6 +227,7 @@ Sideshow.prototype = {
                     me._setMoreAppsMode();
                 else
                     me._setMoreDocsMode();
+                return true;
             }
             return false;
         });
@@ -617,7 +618,7 @@ Sideshow.prototype = {
     // changed, which is ensured by _setMoreDocsMode() and _unsetMoreDocsMode() functions. 
     _updateDocsSection: function() {
         if (this._moreDocsMode) {
-            this._docDisplay.setExpanded(true, this._width + this._additionalWidth,
+            this._docDisplay.setExpanded(true, this._width, this._additionalWidth,
                                          this._itemDisplayHeight + SIDESHOW_SECTION_MISC_HEIGHT,
                                          this._expandedSideshowColumns);
             this._moreDocsLink.setText("Less...");
@@ -625,7 +626,7 @@ Sideshow.prototype = {
             this.actor.add_actor(this._details);
             this._details.append(this._docDisplay.selectedItemDetails, Big.BoxPackFlags.NONE);
         } else {
-            this._docDisplay.setExpanded(false, this._width,
+            this._docDisplay.setExpanded(false, this._width, 0,
                                          this._docsSectionDefaultHeight - SIDESHOW_SECTION_MISC_HEIGHT,
                                          SIDESHOW_COLUMNS);
             this._moreDocsLink.setText("More...");

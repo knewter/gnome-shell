@@ -30,7 +30,7 @@ fi
 # libtool, pkgconfig
 #
 # Devel packages needed by gnome-shell and its deps:
-# dbus-glib, gconf, GL, gtk, libffi, libgnomeui, librsvg, libwnck,
+# dbus-glib, gconf, GL, gnome-menus, gtk, libffi, libgnomeui, librsvg, libwnck,
 # python, readline, spidermonkey ({mozilla,firefox,xulrunner}-js),
 # xdamage
 #
@@ -61,7 +61,7 @@ if test x$system = xUbuntu -o x$system = xDebian ; then
     build-essential curl subversion \
     automake bison flex git-core gnome-common gtk-doc-tools \
     libdbus-glib-1-dev libgconf2-dev libgtk2.0-dev libffi-dev \
-    libgnomeui-dev librsvg2-dev libwnck-dev libgl1-mesa-dev \
+    libgnome-menu-dev libgnomeui-dev librsvg2-dev libwnck-dev libgl1-mesa-dev \
     mesa-common-dev python2.5-dev libreadline5-dev xulrunner-1.9-dev \
     ; do
       if ! dpkg_is_installed $pkg; then
@@ -81,7 +81,7 @@ if test x$system = xFedora ; then
     binutils curl gcc make subversion \
     automake bison flex git gnome-common gnome-doc-utils intltool \
     libtool pkgconfig \
-    dbus-glib-devel GConf2-devel gtk2-devel libffi-devel libgnomeui-devel \
+    dbus-glib-devel GConf2-devel gnome-menus-devel gtk2-devel libffi-devel libgnomeui-devel \
     librsvg2-devel libwnck-devel mesa-libGL-devel python-devel readline-devel \
     xulrunner-devel libXdamage-devel \
     gdb glx-utils xorg-x11-apps xorg-x11-server-Xephyr xterm zenity \
