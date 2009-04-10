@@ -675,7 +675,8 @@ Overlay.prototype = {
 
         let backOver = new Clutter.Rectangle({ color: ROOT_OVERLAY_COLOR,
                                                width: global.screen_width,
-                                               height: global.screen_height });
+                                               height: global.screen_height,
+                                               y: Panel.PANEL_HEIGHT });
         this._group.add_actor(backOver);
 
         this._group.hide();
