@@ -673,6 +673,7 @@ Overlay.prototype = {
         background.height = global.screen_height * 2;
         this._group.add_actor(background);
 
+        // Draw a semitransparent rectangle over the background for readability.
         let backOver = new Clutter.Rectangle({ color: ROOT_OVERLAY_COLOR,
                                                width: global.screen_width,
                                                height: global.screen_height });
