@@ -754,7 +754,7 @@ update_root_window_pixmap (ShellGlobal *global)
                        0, INT_MAX - 3,
                        FALSE,
                        &prop_type, NULL, &prop_size,
-                       (guchar**)&pixmaps) &&
+                       (guchar **)&pixmaps) &&
       (prop_type == GDK_TARGET_PIXMAP) &&
       (prop_size >= (int)sizeof(XID)) &&
       (pixmaps != NULL))
