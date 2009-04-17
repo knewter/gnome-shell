@@ -21,7 +21,7 @@ const Workspaces = imports.ui.workspaces;
 const TRANSPARENT_COLOR = new Clutter.Color();
 TRANSPARENT_COLOR.from_pixel(0x00000000);
 const ROOT_OVERLAY_COLOR = new Clutter.Color();
-ROOT_OVERLAY_COLOR.from_pixel(0x000000cc);
+ROOT_OVERLAY_COLOR.from_pixel(0x000000bb);
 
 const LABEL_HEIGHT = 16;
 // We use SIDESHOW_PAD for the padding on the left side of the sideshow and as a gap
