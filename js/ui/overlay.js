@@ -140,19 +140,23 @@ Sideshow.prototype = {
         let asideXFactor = wideScreen ? WORKSPACES_X_FACTOR_ASIDE_MODE_WIDE_SCREEN : WORKSPACES_X_FACTOR_ASIDE_MODE_REGULAR_SCREEN; 
         this._expandedSideshowColumns = wideScreen ? EXPANDED_SIDESHOW_COLUMNS_WIDE_SCREEN : EXPANDED_SIDESHOW_COLUMNS_REGULAR_SCREEN;       
 
-        this._width = displayGridColumnWidth - SIDESHOW_PAD;
+        this._width = displayGridColumnWidth;
+        this._displayWidth = this._width - SIDESHOW_PAD;
+
+        this._expandedWidth = displayGridColumnWidth * asideXFactor;
 
         // this figures out the additional width we can give to the display in the 'More' mode,
         // assuming that we want to keep the columns the same width in both modes
-        this._additionalWidth = ((this._width + SIDESHOW_PAD) / SIDESHOW_COLUMNS) * 
+        this._additionalWidth = (this._width / SIDESHOW_COLUMNS) * 
                                 (this._expandedSideshowColumns - SIDESHOW_COLUMNS);
 
-        let previewWidth = displayGridColumnWidth * asideXFactor - this._width - 
-                           this._additionalWidth - SIDESHOW_SECTION_SPACING * 2; 
+        let previewWidth = this._expandedWidth - this._width - 
+                           this._additionalWidth - SIDESHOW_SECTION_SPACING; 
 
         let global = Shell.Global.get();
         this.actor = new Clutter.Group();
-        this._searchEntry = new SearchEntry(this._width);
+        this.actor.height = global.screen_height;
+        this._searchEntry = new SearchEntry(this._displayWidth);
         this.actor.add_actor(this._searchEntry.actor);
 
         this._searchEntry.actor.set_position(SIDESHOW_PAD, Panel.PANEL_HEIGHT + SIDESHOW_PAD);
@@ -266,7 +270,7 @@ Sideshow.prototype = {
         
         this._appsContent = new Big.Box({ orientation: Big.BoxOrientation.HORIZONTAL });
         this._appsSection.append(this._appsContent, Big.BoxPackFlags.EXPAND);
-        this._appDisplay = new AppDisplay.AppDisplay(this._width, this._itemDisplayHeight / 2, SIDESHOW_COLUMNS, SIDESHOW_PAD);
+        this._appDisplay = new AppDisplay.AppDisplay(this._displayWidth, this._itemDisplayHeight / 2, SIDESHOW_COLUMNS, SIDESHOW_PAD);
         let sideArea = this._appDisplay.getSideArea();
         sideArea.hide();
         this._appsContent.append(sideArea, Big.BoxPackFlags.NONE);
@@ -298,7 +302,7 @@ Sideshow.prototype = {
                                             height: LABEL_HEIGHT});
         this._docsSection.append(this._docsText, Big.BoxPackFlags.EXPAND);
 
-        this._docDisplay = new DocDisplay.DocDisplay(this._width, this._itemDisplayHeight - this._appsContent.height, SIDESHOW_COLUMNS, SIDESHOW_PAD);
+        this._docDisplay = new DocDisplay.DocDisplay(this._displayWidth, this._itemDisplayHeight - this._appsContent.height, SIDESHOW_COLUMNS, SIDESHOW_PAD);
         this._docsSection.append(this._docDisplay.actor, Big.BoxPackFlags.EXPAND);
 
         let moreDocsBox = new Big.Box({x_align: Big.BoxAlignment.END});
@@ -316,7 +320,7 @@ Sideshow.prototype = {
         this._docsDisplayControlBox = new Big.Box({x_align: Big.BoxAlignment.CENTER});
         this._docsDisplayControlBox.append(this._docDisplay.displayControl, Big.BoxPackFlags.NONE);
 
-        this._details = new Big.Box({ x: SIDESHOW_PAD + this._width + this._additionalWidth + SIDESHOW_SECTION_SPACING,
+        this._details = new Big.Box({ x: this._width + this._additionalWidth + SIDESHOW_SECTION_SPACING,
                                       y: Panel.PANEL_HEIGHT + SIDESHOW_PAD,
                                       width: previewWidth,
                                       height: global.screen_height - Panel.PANEL_HEIGHT - SIDESHOW_PAD - bottomHeight,
@@ -427,6 +431,7 @@ Sideshow.prototype = {
         this._moreAppsLink.actor.hide();
         this._appsSection.set_clip(0, 0, this._appsSection.width, this._appsSection.height);
 
+        this.actor.set_clip(0, 0, this.actor.width, this.actor.height);
         // Move the selection to the applications section if it was in the docs section.
         this._docDisplay.unsetSelected();
         // Because we have menus in applications, we want to reset the selection for applications
@@ -450,6 +455,12 @@ Sideshow.prototype = {
                            onComplete: this._onAppsSectionExpanded,
                            onCompleteScope: this
                          }); 
+
+        Tweener.addTween(this.actor,
+                         { clipWidthRight: this._expandedWidth,
+                           time: ANIMATION_TIME,
+                           transition: "easeOutQuad"
+                         });      
                    
         this.emit('more-activated'); 
     },
@@ -464,7 +475,7 @@ Sideshow.prototype = {
         this._moreAppsLink.actor.hide();
 
         this._appsSection.set_clip(0, 0, this._appsSection.width, this._appsSection.height);
-
+        this.actor.set_clip(0, 0, this.actor.width, this.actor.height);
         this._docDisplay.show();
 
         // We need to be reducing the clip on the applications section so that the last application to
@@ -483,7 +494,11 @@ Sideshow.prototype = {
                            time: ANIMATION_TIME,
                            transition: "easeOutQuad"
                          });  
- 
+        Tweener.addTween(this.actor,
+                         { clipWidthRight: this._width,
+                           time: ANIMATION_TIME,
+                           transition: "easeOutQuad"
+                         });    
         this.emit('less-activated');
     },
 
@@ -492,6 +507,7 @@ Sideshow.prototype = {
     _onAppsSectionExpanded: function() {
         this._appsSection.remove_clip(); 
         this._docDisplay.hide();
+        this.actor.remove_clip();
     },
 
     // Updates the applications section to contain fewer items. Selects the first item in the 
@@ -500,6 +516,7 @@ Sideshow.prototype = {
     // Removes the clip from the documents section, so that the clip does not limit the size of 
     // the section if it is expanded later.
     _onAppsSectionReduced: function() {
+        this.actor.remove_clip();
         if (this._moreAppsMode != STATE_PENDING_INACTIVE)
             return;
         this._moreAppsMode = STATE_INACTIVE;
@@ -516,7 +533,7 @@ Sideshow.prototype = {
     _updateAppsSection: function() {
         if (this._moreAppsMode) {
             // Subtract one from columns since we are displaying menus
-            this._appDisplay.setExpanded(true, this._width, this._additionalWidth,
+            this._appDisplay.setExpanded(true, this._displayWidth, this._additionalWidth,
                                          this._itemDisplayHeight + SIDESHOW_SECTION_MISC_HEIGHT,
                                          this._expandedSideshowColumns - 1);
             this._moreAppsLink.setText("Less...");
@@ -524,7 +541,7 @@ Sideshow.prototype = {
             this.actor.add_actor(this._details);
             this._details.append(this._appDisplay.selectedItemDetails, Big.BoxPackFlags.NONE);
         } else {
-            this._appDisplay.setExpanded(false, this._width, 0,
+            this._appDisplay.setExpanded(false, this._displayWidth, 0,
                                          this._appsSectionDefaultHeight - SIDESHOW_SECTION_MISC_HEIGHT,
                                          SIDESHOW_COLUMNS);
             this._moreAppsLink.setText("More...");
@@ -550,6 +567,8 @@ Sideshow.prototype = {
         this._moreDocsLink.actor.hide();
         this._docsSection.set_clip(0, 0, this._docsSection.width, this._docsSection.height);
 
+        this.actor.set_clip(0, 0, this.actor.width, this.actor.height);
+
         // Move the selection to the docs section if it was in the apps section.
         this._appDisplay.unsetSelected();
         if (!this._docDisplay.hasSelected())
@@ -574,7 +593,14 @@ Sideshow.prototype = {
                            transition: "easeOutQuad",
                            onComplete: this._onDocsSectionExpanded,
                            onCompleteScope: this
-                         });                   
+                         });    
+
+        Tweener.addTween(this.actor,
+                         { clipWidthRight: this._expandedWidth,
+                           time: ANIMATION_TIME,
+                           transition: "easeOutQuad"
+                         });      
+
         this.emit('more-activated'); 
     },
 
@@ -589,7 +615,7 @@ Sideshow.prototype = {
         this._moreDocsLink.actor.hide();
          
         this._docsSection.set_clip(0, 0, this._docsSection.width, this._docsSection.height);
-
+        this.actor.set_clip(0, 0, this.actor.width, this.actor.height);
         this._appsContent.show();
 
         Tweener.addTween(this._docsSection,
@@ -606,6 +632,12 @@ Sideshow.prototype = {
                            time: ANIMATION_TIME,
                            transition: "easeOutQuad"
                          });  
+        Tweener.addTween(this.actor,
+                         { clipWidthRight: this._width,
+                           time: ANIMATION_TIME,
+                           transition: "easeOutQuad"
+                         });   
+
         this.emit('less-activated');
     },
 
@@ -614,6 +646,7 @@ Sideshow.prototype = {
     _onDocsSectionExpanded: function() {
         this._docsSection.remove_clip(); 
         this._appsContent.hide();
+        this.actor.remove_clip();
     },
 
     // Updates the documents section to contain fewer items. Selects the first item in the 
@@ -622,6 +655,7 @@ Sideshow.prototype = {
     // Removes the clip from the applications section, so that the clip does not limit the size of 
     // the section if it is expanded later.
     _onDocsSectionReduced: function() {
+        this.actor.remove_clip();
         this._updateDocsSection();  
         if (!this._docDisplay.hasItems())
             this._appDisplay.selectFirstItem();
@@ -634,7 +668,7 @@ Sideshow.prototype = {
     // changed, which is ensured by _setMoreDocsMode() and _unsetMoreDocsMode() functions. 
     _updateDocsSection: function() {
         if (this._moreDocsMode) {
-            this._docDisplay.setExpanded(true, this._width, this._additionalWidth,
+            this._docDisplay.setExpanded(true, this._displayWidth, this._additionalWidth,
                                          this._itemDisplayHeight + SIDESHOW_SECTION_MISC_HEIGHT,
                                          this._expandedSideshowColumns);
             this._moreDocsLink.setText("Less...");
@@ -642,7 +676,7 @@ Sideshow.prototype = {
             this.actor.add_actor(this._details);
             this._details.append(this._docDisplay.selectedItemDetails, Big.BoxPackFlags.NONE);
         } else {
-            this._docDisplay.setExpanded(false, this._width, 0,
+            this._docDisplay.setExpanded(false, this._displayWidth, 0,
                                          this._docsSectionDefaultHeight - SIDESHOW_SECTION_MISC_HEIGHT,
                                          SIDESHOW_COLUMNS);
             this._moreDocsLink.setText("More...");
@@ -703,7 +737,6 @@ Overlay.prototype = {
         this._sideshow = new Sideshow();
         this._group.add_actor(this._sideshow.actor); 
         this._workspaces = null;
-        this._workspacesBackground = null;
         this._sideshow.connect('activated', function(sideshow) {
             // TODO - have some sort of animation/effect while
             // transitioning to the new app.  We definitely need
@@ -717,17 +750,6 @@ Overlay.prototype = {
                 let workspacesX = displayGridColumnWidth * asideXFactor + WORKSPACE_GRID_PADDING;
                 me._workspaces.addButton.hide();
                 me._workspaces.updatePosition(workspacesX, null);
-                // lower the sideshow below the workspaces background, so that the workspaces
-                // background covers the parts of the sideshow that are gradually being 
-                // revealed from underneath it
-                me._sideshow.actor.lower(me._workspacesBackground);
-                Tweener.addTween(me._workspacesBackground,
-                                 { x: displayGridColumnWidth * asideXFactor,
-                                   time: ANIMATION_TIME,
-                                   transition: "easeOutQuad",
-                                   onComplete: me._animationDone,
-                                   onCompleteScope: me
-                                 });
             }    
         });
         this._sideshow.connect('less-activated', function(sideshow) {
@@ -735,16 +757,6 @@ Overlay.prototype = {
                 let workspacesX = displayGridColumnWidth + WORKSPACE_GRID_PADDING;
                 me._workspaces.addButton.show();
                 me._workspaces.updatePosition(workspacesX, null);
-                // lower the sideshow below the workspaces background, so that the workspaces
-                // background covers the parts of the sideshow as it slides in over them
-                me._sideshow.actor.lower(me._workspacesBackground);
-                Tweener.addTween(me._workspacesBackground,
-                                 { x: displayGridColumnWidth,
-                                   time: ANIMATION_TIME,
-                                   transition: "easeOutQuad",
-                                   onComplete: me._animationDone,
-                                   onCompleteScope: me
-                                 });  
             }
         });
     },
@@ -794,18 +806,6 @@ Overlay.prototype = {
         let addButtonX = workspacesX + workspacesWidth - addButtonSize;
         let addButtonY = screenHeight - Math.floor(displayGridRowHeight * 4/5);
 
-        // We use the workspaces background to have it fill the full height of the overlay when we are sliding
-        // the workspaces out to uncover the expanded items display and also when we are sliding the
-        // workspaces back in to gradually cover the expanded items display. If we don't have such background,
-        // we get a few items above or below the workspaces display that disappear or appear abruptly.  
-        this._workspacesBackground = new Clutter.Rectangle({ color: TRANSPARENT_COLOR,
-                                                             reactive: false,
-                                                             x: displayGridColumnWidth,
-                                                             y: Panel.PANEL_HEIGHT,
-                                                             width: displayGridColumnWidth * columnsUsed,
-                                                             height: global.screen_height - Panel.PANEL_HEIGHT });
-        this._group.add_actor(this._workspacesBackground);
-
         this._workspaces = new Workspaces.Workspaces(workspacesWidth, workspacesHeight, workspacesX, workspacesY, 
                                                      addButtonSize, addButtonX, addButtonY);
         this._group.add_actor(this._workspaces.actor);
@@ -834,7 +834,7 @@ Overlay.prototype = {
 
         this._hideInProgress = true;
         // lower the sideshow, so that workspaces display is on top and covers the sideshow while it is sliding out
-        this._sideshow.actor.lower(this._workspacesBackground);
+        this._sideshow.actor.lower(this._workspaces.actor);
         this._workspaces.hide();
 
         // Dummy tween, just waiting for the workspace animation
@@ -872,9 +872,6 @@ Overlay.prototype = {
         this._workspaces.destroy();
         this._workspaces = null;
 
-        this._workspacesBackground.destroy();
-        this._workspacesBackground = null;
-
         this._sideshow.hide();
         this._group.hide();
 
@@ -907,4 +904,15 @@ function _clipHeightTopGet(actor) {
 
 function _clipHeightTopSet(actor, clipHeight) {
     actor.set_clip(0, actor.height - clipHeight, actor.width, clipHeight);
+}
+
+Tweener.registerSpecialProperty("clipWidthRight", _clipWidthRightGet, _clipWidthRightSet);
+
+function _clipWidthRightGet(actor) {
+    let [xOffset, yOffset, clipWidth, clipHeight] = actor.get_clip();
+    return clipWidth;
+}
+
+function _clipWidthRightSet(actor, clipWidth) {
+    actor.set_clip(0, 0, clipWidth, actor.height);
 }
