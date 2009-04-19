@@ -721,6 +721,8 @@ Overlay.prototype = {
         let background = global.create_root_pixmap_actor();
         background.width = global.screen_width * 2;
         background.height = global.screen_height * 2;
+        background.x = -global.screen_width / 2;
+        background.y = -global.screen_height / 2;
         this._group.add_actor(background);
 
         // Draw a semitransparent rectangle over the background for readability.
