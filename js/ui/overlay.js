@@ -23,6 +23,10 @@ TRANSPARENT_COLOR.from_pixel(0x00000000);
 const ROOT_OVERLAY_COLOR = new Clutter.Color();
 ROOT_OVERLAY_COLOR.from_pixel(0x000000bb);
 
+// The factor to scale the overlay wallpaper with. This should not be less
+// than 3/2, because the rule of thirds is used for positioning (see below).
+const BACKGROUND_SCALE = 2;
+
 const LABEL_HEIGHT = 16;
 // We use SIDESHOW_PAD for the padding on the left side of the sideshow and as a gap
 // between sideshow columns.
@@ -718,17 +722,22 @@ Overlay.prototype = {
         this.visible = false;
         this._hideInProgress = false;
 
+        // A scaled root pixmap actor is used as a background. It is zoomed in
+        // to the lower right intersection of the lines that divide the image
+        // evenly in a 3x3 grid. This is based on the rule of thirds, a
+        // compositional rule of thumb in visual arts. The choice for the
+        // lower right point is based on a quick survey of GNOME wallpapers.
         let background = global.create_root_pixmap_actor();
-        background.width = global.screen_width * 2;
-        background.height = global.screen_height * 2;
-        background.x = -global.screen_width / 2;
-        background.y = -global.screen_height / 2;
+        background.width = global.screen_width * BACKGROUND_SCALE;
+        background.height = global.screen_height * BACKGROUND_SCALE;
+        background.x = -global.screen_width * (4 * BACKGROUND_SCALE - 3) / 6;
+        background.y = -global.screen_height * (4 * BACKGROUND_SCALE - 3) / 6;
         this._group.add_actor(background);
 
         // Draw a semitransparent rectangle over the background for readability.
         let backOver = new Clutter.Rectangle({ color: ROOT_OVERLAY_COLOR,
                                                width: global.screen_width,
-                                               height: global.screen_height,
+                                               height: global.screen_height - Panel.PANEL_HEIGHT,
                                                y: Panel.PANEL_HEIGHT });
         this._group.add_actor(backOver);
 
