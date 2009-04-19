@@ -214,8 +214,11 @@ create_bg_pixmap (GdkColormap  *colormap,
   GdkPixmap *pixmap = gdk_pixmap_new (gdk_screen_get_root_window (screen),
                                       1, 1,
                                       visual->depth);
+  cairo_t *cr;
 
-  cairo_t *cr = gdk_cairo_create (pixmap);
+  gdk_drawable_set_colormap (pixmap, colormap);
+
+  cr = gdk_cairo_create (pixmap);
   cairo_set_source_rgb (cr,
                         color->red / 255.,
                         color->green / 255.,
@@ -236,6 +239,14 @@ na_tray_icon_added (NaTrayManager *na_manager, GtkWidget *socket,
   ShellTrayManagerChild *child;
   GdkPixmap *bg_pixmap;
 
+  /* We don't need the NaTrayIcon to be composited on the window we
+   * put it in: the window is the same size as the tray icon
+   * and transparent. We can just use the default X handling of
+   * subwindows as mode of SOURCE (replace the parent with the
+   * child) and then composite the parent onto the stage.
+   */
+  na_tray_child_set_composited (NA_TRAY_CHILD (socket), FALSE);
+
   win = gtk_window_new (GTK_WINDOW_POPUP);
   gtk_container_add (GTK_CONTAINER (win), socket);
 
@@ -252,11 +263,8 @@ na_tray_icon_added (NaTrayManager *na_manager, GtkWidget *socket,
    * that color and setting it as our background. Then "parent-relative"
    * background on the socket and the plug within that will cause
    * the icons contents to appear on top of our background color.
-   *
-   * Ordering warning: na_tray_child_is_composited() doesn't work
-   *   until the tray child has been realized.
    */
-  if (!na_tray_child_is_composited (NA_TRAY_CHILD (socket)))
+  if (!na_tray_child_has_alpha (NA_TRAY_CHILD (socket)))
     {
       bg_pixmap = create_bg_pixmap (gtk_widget_get_colormap (win),
                                     &manager->priv->bg_color);

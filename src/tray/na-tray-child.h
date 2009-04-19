@@ -28,14 +28,14 @@
 
 G_BEGIN_DECLS
 
-#define NA_TYPE_TRAY_CHILD			(na_tray_child_get_type ())
-#define NA_TRAY_CHILD(obj)			(G_TYPE_CHECK_INSTANCE_CAST ((obj), NA_TYPE_TRAY_CHILD, NaTrayChild))
-#define NA_TRAY_CHILD_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST ((klass), NA_TYPE_TRAY_CHILD, NaTrayChildClass))
-#define NA_IS_TRAY_CHILD(obj)			(G_TYPE_CHECK_INSTANCE_TYPE ((obj), NA_TYPE_TRAY_CHILD))
-#define NA_IS_TRAY_CHILD_CLASS(klass)		(G_TYPE_CHECK_CLASS_TYPE ((klass), NA_TYPE_TRAY_CHILD))
-#define NA_TRAY_CHILD_GET_CLASS(obj)		(G_TYPE_INSTANCE_GET_CLASS ((obj), NA_TYPE_TRAY_CHILD, NaTrayChildClass))
+#define NA_TYPE_TRAY_CHILD		(na_tray_child_get_type ())
+#define NA_TRAY_CHILD(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), NA_TYPE_TRAY_CHILD, NaTrayChild))
+#define NA_TRAY_CHILD_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST ((klass), NA_TYPE_TRAY_CHILD, NaTrayChildClass))
+#define NA_IS_TRAY_CHILD(obj)		(G_TYPE_CHECK_INSTANCE_TYPE ((obj), NA_TYPE_TRAY_CHILD))
+#define NA_IS_TRAY_CHILD_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), NA_TYPE_TRAY_CHILD))
+#define NA_TRAY_CHILD_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), NA_TYPE_TRAY_CHILD, NaTrayChildClass))
 
-typedef struct _NaTrayChild	    NaTrayChild;
+typedef struct _NaTrayChild	  NaTrayChild;
 typedef struct _NaTrayChildClass  NaTrayChildClass;
 typedef struct _NaTrayChildChild  NaTrayChildChild;
 
@@ -43,7 +43,8 @@ struct _NaTrayChild
 {
   GtkSocket parent_instance;
   Window icon_window;
-  guint is_composited : 1;
+  guint has_alpha : 1;
+  guint composited : 1;
   guint parent_relative_bg : 1;
 };
 
@@ -54,11 +55,13 @@ struct _NaTrayChildClass
 
 GType           na_tray_child_get_type        (void);
 
-GtkWidget      *na_tray_child_new           (GdkScreen   *screen,
-					     Window       icon_window);
-char           *na_tray_child_get_title     (NaTrayChild *child);
-gboolean        na_tray_child_is_composited (NaTrayChild *child);
-void            na_tray_child_force_redraw  (NaTrayChild *child);
+GtkWidget      *na_tray_child_new            (GdkScreen   *screen,
+					      Window       icon_window);
+char           *na_tray_child_get_title      (NaTrayChild *child);
+gboolean        na_tray_child_has_alpha      (NaTrayChild *child);
+void            na_tray_child_set_composited (NaTrayChild *child,
+	                                      gboolean     composited);
+void            na_tray_child_force_redraw   (NaTrayChild *child);
 
 G_END_DECLS
 
