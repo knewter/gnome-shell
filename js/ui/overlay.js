@@ -837,16 +837,33 @@ Overlay.prototype = {
                            onComplete: this._animationDone,
                            onCompleteScope: this
                          });
+
+        this._sideshow.actor.set_clip(0, 0, this._workspaces.getFullSizeX(), this._sideshow.actor.height);
+        log("first workspace width " + this._workspaces._workspaces[0].actor.width);
+        Tweener.addTween(this._sideshow.actor,
+                         { time: ANIMATION_TIME,
+                           clipWidthRight: this._sideshow._width + WORKSPACE_GRID_PADDING + this._workspaces.getWidthToTopActiveWorkspace(),
+                           transition: "easeOutQuad" });
     },
 
     hide : function() {
         if (!this.visible || this._hideInProgress)
             return;
 
+        let global = Shell.Global.get();
+
         this._hideInProgress = true;
         // lower the sideshow, so that workspaces display is on top and covers the sideshow while it is sliding out
         this._sideshow.actor.lower(this._workspaces.actor);
         this._workspaces.hide();
+
+        log("this._sideshow.actor.width " + this._sideshow.actor.width);
+        log("first workspace width " + this._workspaces._workspaces[0].actor.width);
+        this._sideshow.actor.set_clip(0, 0, this._sideshow.actor.width + WORKSPACE_GRID_PADDING + this._workspaces.getWidthToTopActiveWorkspace(), this._sideshow.actor.height);
+        Tweener.addTween(this._sideshow.actor,
+                         { time: ANIMATION_TIME,
+                           clipWidthRight: this._workspaces.getFullSizeX() + this._workspaces.getWidthToTopActiveWorkspace() - global.screen_width,
+                           transition: "easeOutQuad" });
 
         // Dummy tween, just waiting for the workspace animation
         Tweener.addTween(this,
@@ -872,8 +889,9 @@ Overlay.prototype = {
         if (this._hideInProgress)
             return;
 
-       this._sideshow.actor.raise_top();
-    }, 
+        this._sideshow.actor.raise_top();
+        this._sideshow.actor.remove_clip();
+    },
 
     _hideDone: function() {
         let global = Shell.Global.get();

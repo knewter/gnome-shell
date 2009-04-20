@@ -866,6 +866,23 @@ Workspaces.prototype = {
         global.window_manager.disconnect(this._switchWorkspaceNotifyId);
     },
 
+    getFullSizeX : function() {
+        return this._workspaces[0].fullSizeX;
+    },
+
+    getWidthToTopActiveWorkspace : function() {
+        let global = Shell.Global.get();
+        let activeWorkspaceIndex = global.screen.get_active_workspace_index();
+        let activeWorkspace = this._workspaces[activeWorkspaceIndex];
+        let result = 0;
+        if (activeWorkspace.gridRow == 0)
+            result = (activeWorkspace.gridCol + 1) * global.screen_width + activeWorkspace.gridCol * GRID_SPACING;
+        else
+            result = global.screen_width;
+        log("returning " + result);
+        return result;
+    },
+
     // Updates the workspaces display based on the current dimensions and position.
     _updateInOverlay : function() {
         let global = Shell.Global.get();  
