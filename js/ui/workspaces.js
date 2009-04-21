@@ -873,18 +873,17 @@ Workspaces.prototype = {
     // If j-th workspace in the i-th row is active, returns the full width
     // of j workspaces including empty space if i = 1, or the width of one
     // workspace.
+    // Used in overlay.js to determine when it is ok to remove the sideshow
+    // during animations for entering and leaving the overlay. 
     getWidthToTopActiveWorkspace : function() {
         let global = Shell.Global.get();
         let activeWorkspaceIndex = global.screen.get_active_workspace_index();
         let activeWorkspace = this._workspaces[activeWorkspaceIndex];
-        let result = 0;
 
         if (activeWorkspace.gridRow == 0)
-            result = (activeWorkspace.gridCol + 1) * global.screen_width + activeWorkspace.gridCol * GRID_SPACING;
+            return (activeWorkspace.gridCol + 1) * global.screen_width + activeWorkspace.gridCol * GRID_SPACING;
         else
-            result = global.screen_width;
-
-        return result;
+            return global.screen_width;
     },
 
     // Updates the workspaces display based on the current dimensions and position.

@@ -18,8 +18,6 @@ const Panel = imports.ui.panel;
 const Tweener = imports.ui.tweener;
 const Workspaces = imports.ui.workspaces;
 
-const TRANSPARENT_COLOR = new Clutter.Color();
-TRANSPARENT_COLOR.from_pixel(0x00000000);
 const ROOT_OVERLAY_COLOR = new Clutter.Color();
 ROOT_OVERLAY_COLOR.from_pixel(0x000000bb);
 
@@ -831,27 +829,26 @@ Overlay.prototype = {
         global.window_group.hide();
         this._group.show();
 
-        // Dummy tween, just waiting for the workspace animation
-        Tweener.addTween(this,
-                         { time: ANIMATION_TIME,
-                           onComplete: this._animationDone,
-                           onCompleteScope: this
-                         });
-
         // Try to make the menu not too visible behind the empty space between
-        // the workspace previews by sliding in its clipping rectangle. It
-        // starts at the left of the sideshow, and moves along with the
-        // rightmost point of the active workspace if it's at the top, or to
-        // the rightmost point of the first workspace. Top workspaces are
-        // handled differently because they move almost horizontally. The
-        // clipping is removed in this._animationDone().
+        // the workspace previews by sliding in its clipping rectangle.
+        // We want to finish drawing the sideshow just before the top workspace fully
+        // slides in on the top.  Which means that we have more time to wait before
+        // drawing the sideshow if the active workspace is displayed on the bottom of
+        // the workspaces grid, and almost no time to wait if it is displayed in the top
+        // row of the workspaces grid. The calculations used below try to roughly
+        // capture the animation ratio for when workspaces are covering the top of the overlay
+        // vs. when workspaces are already below the top of the overlay, and apply it
+        // to clipping the sideshow.  The clipping is removed in this._showDone().
         this._sideshow.actor.set_clip(0, 0,
                                       this._workspaces.getFullSizeX(),
                                       this._sideshow.actor.height);
         Tweener.addTween(this._sideshow.actor,
-                         { time: ANIMATION_TIME,
-                           clipWidthRight: this._sideshow._width + WORKSPACE_GRID_PADDING + this._workspaces.getWidthToTopActiveWorkspace(),
-                           transition: "easeOutQuad"
+                         { clipWidthRight: this._sideshow._width + WORKSPACE_GRID_PADDING + this._workspaces.getWidthToTopActiveWorkspace(),
+                           time: ANIMATION_TIME,
+                           transition: "easeOutQuad",
+                           onComplete: this._showDone,
+                           onCompleteScope: this
+
                          });
     },
 
@@ -867,23 +864,20 @@ Overlay.prototype = {
         this._workspaces.hide();
 
         // Try to make the menu not too visible behind the empty space between
-        // the workspace previews by sliding in its clipping rectangle. It
-        // starts where the animation defined in this.show() ends, and moves
-        // along with the same point as in this.show() so that it ends at the
-        // left of the sideshow again. The clipping is removed in
-        // this._animationDone().
+        // the workspace previews by sliding in its clipping rectangle.
+        // The logic used is the same as described in this.show(). If the active workspace
+        // is displayed in the top row, than almost full animation time is needed for it
+        // to reach the top of the overlay and cover the sideshow fully, while if the
+        // active workspace is in the lower row, than the top left workspace reaches the
+        // top of the overlay sooner as it is moving out of the way.
+        // The clipping is removed in this._hideDone().
         this._sideshow.actor.set_clip(0, 0,
                                       this._sideshow.actor.width + WORKSPACE_GRID_PADDING + this._workspaces.getWidthToTopActiveWorkspace(),
                                       this._sideshow.actor.height);
         Tweener.addTween(this._sideshow.actor,
-                         { time: ANIMATION_TIME,
-                           clipWidthRight: this._workspaces.getFullSizeX() + this._workspaces.getWidthToTopActiveWorkspace() - global.screen_width,
-                           transition: "easeOutQuad"
-                         });
-
-        // Dummy tween, just waiting for the workspace animation
-        Tweener.addTween(this,
-                         { time: ANIMATION_TIME,
+                         { clipWidthRight: this._workspaces.getFullSizeX() + this._workspaces.getWidthToTopActiveWorkspace() - global.screen_width,
+                           time: ANIMATION_TIME,
+                           transition: "easeOutQuad",
                            onComplete: this._hideDone,
                            onCompleteScope: this
                          });
@@ -892,16 +886,14 @@ Overlay.prototype = {
     //// Private methods ////
 
     // Raises the sideshow to the top, so that we can tell if the pointer is above one of its items.
-    // We need to do this every time animation of the workspaces is done bacause the workspaces actor
-    // currently covers the whole screen, regardless of where the workspaces are actually displayed. 
-    // On the other hand, we need the workspaces to be on top when they are sliding in, out,
-    // and to the side because we want them to cover the sideshow as they do that.
+    // We need to do this once the workspaces are shown bacause the workspaces actor currently covers 
+    // the whole screen, regardless of where the workspaces are actually displayed. 
     //
     // Once we rework the workspaces actor to only cover the area it actually needs, we can
     // remove this workaround. Also http://bugzilla.openedhand.com/show_bug.cgi?id=1513 requests being
     // able to pick only a reactive actor at a certain position, rather than any actor. Being able
     // to do that would allow us to not have to raise the sideshow.  
-    _animationDone: function() {
+    _showDone: function() {
         if (this._hideInProgress)
             return;
 
@@ -917,6 +909,7 @@ Overlay.prototype = {
         this._workspaces.destroy();
         this._workspaces = null;
 
+        this._sideshow.actor.remove_clip();
         this._sideshow.hide();
         this._group.hide();
 
