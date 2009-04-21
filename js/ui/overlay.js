@@ -838,12 +838,14 @@ Overlay.prototype = {
                            onCompleteScope: this
                          });
 
-        this._sideshow.actor.set_clip(0, 0, this._workspaces.getFullSizeX(), this._sideshow.actor.height);
-        log("first workspace width " + this._workspaces._workspaces[0].actor.width);
+        this._sideshow.actor.set_clip(0, 0,
+                                      this._workspaces.getFullSizeX(),
+                                      this._sideshow.actor.height);
         Tweener.addTween(this._sideshow.actor,
                          { time: ANIMATION_TIME,
                            clipWidthRight: this._sideshow._width + WORKSPACE_GRID_PADDING + this._workspaces.getWidthToTopActiveWorkspace(),
-                           transition: "easeOutQuad" });
+                           transition: "easeOutQuad"
+                         });
     },
 
     hide : function() {
@@ -857,13 +859,14 @@ Overlay.prototype = {
         this._sideshow.actor.lower(this._workspaces.actor);
         this._workspaces.hide();
 
-        log("this._sideshow.actor.width " + this._sideshow.actor.width);
-        log("first workspace width " + this._workspaces._workspaces[0].actor.width);
-        this._sideshow.actor.set_clip(0, 0, this._sideshow.actor.width + WORKSPACE_GRID_PADDING + this._workspaces.getWidthToTopActiveWorkspace(), this._sideshow.actor.height);
+        this._sideshow.actor.set_clip(0, 0,
+                                      this._sideshow.actor.width + WORKSPACE_GRID_PADDING + this._workspaces.getWidthToTopActiveWorkspace(),
+                                      this._sideshow.actor.height);
         Tweener.addTween(this._sideshow.actor,
                          { time: ANIMATION_TIME,
                            clipWidthRight: this._workspaces.getFullSizeX() + this._workspaces.getWidthToTopActiveWorkspace() - global.screen_width,
-                           transition: "easeOutQuad" });
+                           transition: "easeOutQuad"
+                         });
 
         // Dummy tween, just waiting for the workspace animation
         Tweener.addTween(this,
