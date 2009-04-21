@@ -457,7 +457,7 @@ Sideshow.prototype = {
                            transition: "easeOutQuad",
                            onComplete: this._onAppsSectionExpanded,
                            onCompleteScope: this
-                         }); 
+                         });
 
         this.actor.set_clip(0, 0, this.actor.width, this.actor.height);
         Tweener.addTween(this.actor,
