@@ -870,7 +870,7 @@ Workspaces.prototype = {
         return this._workspaces[0].fullSizeX;
     },
 
-    // If j-th workspace in the i-th column is active, returns the full width
+    // If j-th workspace in the i-th row is active, returns the full width
     // of j workspaces including empty space if i = 1, or the width of one
     // workspace.
     getWidthToTopActiveWorkspace : function() {
