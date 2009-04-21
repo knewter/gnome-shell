@@ -435,7 +435,6 @@ Sideshow.prototype = {
         this._moreAppsLink.actor.hide();
         this._appsSection.set_clip(0, 0, this._appsSection.width, this._appsSection.height);
 
-        this.actor.set_clip(0, 0, this.actor.width, this.actor.height);
         // Move the selection to the applications section if it was in the docs section.
         this._docDisplay.unsetSelected();
         // Because we have menus in applications, we want to reset the selection for applications
@@ -460,12 +459,13 @@ Sideshow.prototype = {
                            onCompleteScope: this
                          }); 
 
+        this.actor.set_clip(0, 0, this.actor.width, this.actor.height);
         Tweener.addTween(this.actor,
                          { clipWidthRight: this._expandedWidth,
                            time: ANIMATION_TIME,
                            transition: "easeOutQuad"
-                         });      
-                   
+                         });
+
         this.emit('more-activated'); 
     },
 
@@ -838,6 +838,8 @@ Overlay.prototype = {
                            onCompleteScope: this
                          });
 
+        // Try to make sure the menu is not visible behind the empty space
+        // between the workspace previews. FIXME: why these dimensions?
         this._sideshow.actor.set_clip(0, 0,
                                       this._workspaces.getFullSizeX(),
                                       this._sideshow.actor.height);
@@ -859,6 +861,8 @@ Overlay.prototype = {
         this._sideshow.actor.lower(this._workspaces.actor);
         this._workspaces.hide();
 
+        // Try to make sure the menu is not visible behind the empty space
+        // between the workspace previews. FIXME: why these dimensions?
         this._sideshow.actor.set_clip(0, 0,
                                       this._sideshow.actor.width + WORKSPACE_GRID_PADDING + this._workspaces.getWidthToTopActiveWorkspace(),
                                       this._sideshow.actor.height);
