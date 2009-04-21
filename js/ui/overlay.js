@@ -838,8 +838,13 @@ Overlay.prototype = {
                            onCompleteScope: this
                          });
 
-        // Try to make sure the menu is not visible behind the empty space
-        // between the workspace previews. FIXME: why these dimensions?
+        // Try to make the menu not too visible behind the empty space between
+        // the workspace previews by sliding in its clipping rectangle. It
+        // starts at the left of the sideshow, and moves along with the
+        // rightmost point of the active workspace if it's at the top, or to
+        // the rightmost point of the first workspace. Top workspaces are
+        // handled differently because they move almost horizontally. The
+        // clipping is removed in this._animationDone().
         this._sideshow.actor.set_clip(0, 0,
                                       this._workspaces.getFullSizeX(),
                                       this._sideshow.actor.height);
@@ -861,8 +866,12 @@ Overlay.prototype = {
         this._sideshow.actor.lower(this._workspaces.actor);
         this._workspaces.hide();
 
-        // Try to make sure the menu is not visible behind the empty space
-        // between the workspace previews. FIXME: why these dimensions?
+        // Try to make the menu not too visible behind the empty space between
+        // the workspace previews by sliding in its clipping rectangle. It
+        // starts where the animation defined in this.show() ends, and moves
+        // along with the same point as in this.show() so that it ends at the
+        // left of the sideshow again. The clipping is removed in
+        // this._animationDone().
         this._sideshow.actor.set_clip(0, 0,
                                       this._sideshow.actor.width + WORKSPACE_GRID_PADDING + this._workspaces.getWidthToTopActiveWorkspace(),
                                       this._sideshow.actor.height);
