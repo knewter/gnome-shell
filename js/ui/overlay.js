@@ -149,11 +149,11 @@ Sideshow.prototype = {
 
         // this figures out the additional width we can give to the display in the 'More' mode,
         // assuming that we want to keep the columns the same width in both modes
-        this._additionalWidth = (this._width / SIDESHOW_COLUMNS) * 
+        this._additionalWidth = (this._width / SIDESHOW_COLUMNS) *
                                 (this._expandedSideshowColumns - SIDESHOW_COLUMNS);
 
-        let previewWidth = this._expandedWidth - this._width - 
-                           this._additionalWidth - SIDESHOW_SECTION_SPACING; 
+        let previewWidth = this._expandedWidth - this._width -
+                           this._additionalWidth - SIDESHOW_SECTION_SPACING;
 
         let global = Shell.Global.get();
         this.actor = new Clutter.Group();
@@ -500,7 +500,7 @@ Sideshow.prototype = {
                          { clipWidthRight: this._width,
                            time: ANIMATION_TIME,
                            transition: "easeOutQuad"
-                         });    
+                         });
         this.emit('less-activated');
     },
 
@@ -595,13 +595,13 @@ Sideshow.prototype = {
                            transition: "easeOutQuad",
                            onComplete: this._onDocsSectionExpanded,
                            onCompleteScope: this
-                         });    
+                         });
 
         Tweener.addTween(this.actor,
                          { clipWidthRight: this._expandedWidth,
                            time: ANIMATION_TIME,
                            transition: "easeOutQuad"
-                         });      
+                         });
 
         this.emit('more-activated'); 
     },
@@ -638,7 +638,7 @@ Sideshow.prototype = {
                          { clipWidthRight: this._width,
                            time: ANIMATION_TIME,
                            transition: "easeOutQuad"
-                         });   
+                         });
 
         this.emit('less-activated');
     },
