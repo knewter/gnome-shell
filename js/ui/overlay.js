@@ -832,13 +832,13 @@ Overlay.prototype = {
         // Try to make the menu not too visible behind the empty space between
         // the workspace previews by sliding in its clipping rectangle.
         // We want to finish drawing the sideshow just before the top workspace fully
-        // slides in on the top.  Which means that we have more time to wait before
+        // slides in on the top. Which means that we have more time to wait before
         // drawing the sideshow if the active workspace is displayed on the bottom of
         // the workspaces grid, and almost no time to wait if it is displayed in the top
         // row of the workspaces grid. The calculations used below try to roughly
         // capture the animation ratio for when workspaces are covering the top of the overlay
         // vs. when workspaces are already below the top of the overlay, and apply it
-        // to clipping the sideshow.  The clipping is removed in this._showDone().
+        // to clipping the sideshow. The clipping is removed in this._showDone().
         this._sideshow.actor.set_clip(0, 0,
                                       this._workspaces.getFullSizeX(),
                                       this._sideshow.actor.height);
@@ -886,8 +886,8 @@ Overlay.prototype = {
     //// Private methods ////
 
     // Raises the sideshow to the top, so that we can tell if the pointer is above one of its items.
-    // We need to do this once the workspaces are shown bacause the workspaces actor currently covers 
-    // the whole screen, regardless of where the workspaces are actually displayed. 
+    // We need to do this once the workspaces are shown because the workspaces actor currently covers
+    // the whole screen, regardless of where the workspaces are actually displayed.
     //
     // Once we rework the workspaces actor to only cover the area it actually needs, we can
     // remove this workaround. Also http://bugzilla.openedhand.com/show_bug.cgi?id=1513 requests being

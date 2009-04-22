@@ -874,7 +874,7 @@ Workspaces.prototype = {
     // of j workspaces including empty space if i = 1, or the width of one
     // workspace.
     // Used in overlay.js to determine when it is ok to remove the sideshow
-    // during animations for entering and leaving the overlay. 
+    // during animations for entering and leaving the overlay.
     getWidthToTopActiveWorkspace : function() {
         let global = Shell.Global.get();
         let activeWorkspaceIndex = global.screen.get_active_workspace_index();
