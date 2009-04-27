@@ -6,6 +6,7 @@ const Mainloop = imports.mainloop;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 
+const Breadcrumbs = imports.ui.breadcrumbs;
 const Button = imports.ui.button;
 const Main = imports.ui.main;
 
@@ -82,9 +83,8 @@ Panel.prototype = {
                                 orientation: Big.BoxOrientation.HORIZONTAL,
                                 spacing: 4 });
 
-        this.button = new Button.Button("Activities", PANEL_BUTTON_COLOR, PRESSED_BUTTON_BACKGROUND_COLOR, true, null, PANEL_HEIGHT);
-
-        box.append(this.button.button, Big.BoxPackFlags.NONE);
+        this.breadcrumbs = new Breadcrumbs.TrailBar();
+        box.append(this.breadcrumbs.actor, Big.BoxPackFlags.NONE);
 
         let statusbox = new Big.Box();
         this._statusmenu = new Shell.StatusMenu();
@@ -146,18 +146,6 @@ Panel.prototype = {
         this._traymanager.manage_stage(global.stage);
 
         // TODO: decide what to do with the rest of the panel in the overlay mode (make it fade-out, become non-reactive, etc.)
-        // We get into the overlay mode on button-press-event as opposed to button-release-event because eventually we'll probably
-        // have the overlay act like a menu that allows the user to release the mouse on the activity the user wants
-        // to switch to.
-        this.button.button.connect('button-press-event',
-            function(o, event) {
-                if (Main.overlay.visible)
-                    Main.hide_overlay();
-                else
-                    Main.show_overlay();
-
-                return true;
-            });
 
         this._setStruts();
         global.screen.connect('notify::n-workspaces',
