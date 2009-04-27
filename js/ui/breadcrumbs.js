@@ -67,6 +67,9 @@ TrailBar.prototype = {
 
         this.activities = new Breadcrumb("Activities", this);
         this.activities.connect("activate", function() {
+            if (this.maximized)
+                this.maximized.unmaximize(Meta.MaximizeFlags.HORIZONTAL | Meta.MaximizeFlags.VERTICAL);
+
             if (!Main.overlayActive)
                 Main.show_overlay();
             /*
