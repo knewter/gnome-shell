@@ -227,8 +227,8 @@ Breadcrumb.prototype = {
         let minWidth = 0;
         let minHeight = 0;
 
-        // if staysPressed is true, this.active will be true past the first release of a button, untill a subsequent one (the button
-        // is unpressed) or untill release() is called explicitly
+        // if staysPressed is true, this.active will be true past the first release of a button, until a subsequent one (the button
+        // is unpressed) or until release() is called explicitly
         this._active = false;
         this._isBetweenPressAndRelease = false;
         this._mouseIsOverButton = false;
