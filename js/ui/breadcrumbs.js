@@ -20,15 +20,18 @@ const SEPARATOR_FONT = "Sans 20px";
 const TEXT_COLOR = new Clutter.Color();
 TEXT_COLOR.from_pixel(0x000000ff);
 
-const ICON_SIZE = 18;
+const ICON_SIZE = 16;
 
 // No different mouseOver background color for now, because of leave-event
 // issues.
 const MOUSE_OVER_BACKGROUND_COLOR = new Clutter.Color();
-MOUSE_OVER_BACKGROUND_COLOR.from_pixel(0x00000000);
+MOUSE_OVER_BACKGROUND_COLOR.from_pixel(0x00000011);
 
 const ACTIVE_BACKGROUND_COLOR = new Clutter.Color();
-ACTIVE_BACKGROUND_COLOR.from_pixel(0x00000033);
+ACTIVE_BACKGROUND_COLOR.from_pixel(0xffffffaa);
+const ACTIVE_BORDER_COLOR = new Clutter.Color();
+ACTIVE_BORDER_COLOR.from_pixel(0x00000033);
+const ACTIVE_CORNER_RADIUS = 12;
 
 function TrailBar() {
     this._init();
@@ -42,6 +45,8 @@ TrailBar.prototype = {
         this._active = null;
         this._lastActive = null;
 
+        this._maximized = null;
+
         this.actor = new Big.Box({ reactive: true,
                                    orientation: Big.BoxOrientation.HORIZONTAL,
                                    y_align: Big.BoxAlignment.FILL });
@@ -50,16 +55,30 @@ TrailBar.prototype = {
                 width: 0,
                 height: Panel.PANEL_HEIGHT,
                 background_color: ACTIVE_BACKGROUND_COLOR });
+        this._indicator = new Big.Box({
+                width: 0,
+                height: Panel.PANEL_HEIGHT - 5,
+                y: 3,
+                border: 1,
+                border_color: ACTIVE_BORDER_COLOR,
+                corner_radius: ACTIVE_CORNER_RADIUS,
+                background_color: ACTIVE_BACKGROUND_COLOR });
         this.actor.append(this._indicator, Big.BoxPackFlags.FIXED);
 
         this.activities = new Breadcrumb("Activities", this);
         this.activities.connect("activate", function() {
-            Main.show_overlay();
-            for each (let window in global.get_windows())
+            if (!Main.overlayActive)
+                Main.show_overlay();
+            /*
+             for each (let window in global.get_windows())
                 if (window.get_window_type() == Meta.CompWindowType.NORMAL)
                     window.get_meta_window().unmaximize(Meta.MaximizeFlags.HORIZONTAL | Meta.MaximizeFlags.VERTICAL);
+             */
         });
-        this.activities.connect("deactivate", Main.hide_overlay);
+        this.activities.connect("deactivate", function() {
+            if (Main.overlayActive)
+                Main.hide_overlay();
+        });
         this.actor.append(this.activities.button, Big.BoxPackFlags.EXPAND);
 
         this.actor.append(new Separator().actor, Big.BoxPackFlags.EXPAND);
@@ -80,7 +99,15 @@ TrailBar.prototype = {
         this.window.connect("activate", function(o, e) {
             let window = global.screen.get_display().get_focus_window();
             if (window) {
+                if (this.maximized) {
+                    Main.wm.animated = false;
+                                        this.maximized.unmaximize(Meta.MaximizeFlags.HORIZONTAL | Meta.MaximizeFlags.VERTICAL);
+
+                }
                 window.maximize(Meta.MaximizeFlags.HORIZONTAL | Meta.MaximizeFlags.VERTICAL);
+                                this.maximized = window;
+
+                Main.wm.animated = true;
                 /*
                  for each (let window in global.get_windows())
                  if (window.get_window_type() == Meta.CompWindowType.NORMAL)
@@ -97,8 +124,11 @@ TrailBar.prototype = {
              window.decorated = true;
              log(window.decorated);
              */
-            if (window)
+            if (window) {
                 window.unmaximize(Meta.MaximizeFlags.HORIZONTAL | Meta.MaximizeFlags.VERTICAL);
+                if (this.maximized)
+                    this.maximized = null;
+            }
              /*
               for each (let window in global.get_windows())
                   if (window.get_window_type() == Meta.CompWindowType.NORMAL)
@@ -109,7 +139,12 @@ TrailBar.prototype = {
         this._breadcrumbs = [this.activities, this.workspace, this.window];
 
         global.screen.connect("restacked", Lang.bind(this, this._updateWindow));
+
         this.activate(this.workspace);
+
+        // hp: connecting to notify::allocation = evil you will regret
+        this.workspace._label.connect("notify::allocation", this._updateIndicator);
+        this.window._label.connect("notify::allocation", this._updateIndicator);
     },
 
     activate : function(breadcrumb) {
@@ -120,11 +155,20 @@ TrailBar.prototype = {
             this._lastActive = this._active;
         }
         this._active = breadcrumb;
-        Tweener.addTween(this._indicator, { x: breadcrumb._button.get_x(),
-                                            width: breadcrumb._button.get_width(),
-                                            time: Overlay.ANIMATION_TIME,
-                                            transition: "easeOutQuad" });
+
+        this._updateIndicator();
+
         breadcrumb.emit("activate");
+    },
+
+    _updateIndicator : function() {
+        if (!Main.panel)
+            return;
+        let me = Main.panel.breadcrumbs;
+        Tweener.addTween(me._indicator, { x: me._active._button.get_x() + 3,
+                                          width: me._active._button.get_width() - 6,
+                                          time: Overlay.ANIMATION_TIME,
+                                          transition: "easeOutQuad" });
     },
 
     deactivate : function() {
@@ -140,7 +184,7 @@ TrailBar.prototype = {
         if (window) {
             this.window._label.set_text(window.title);
 
-            let pixbuf = window./*mini_*/icon;
+            let pixbuf = window.mini_icon;
             Shell.clutter_texture_set_from_pixbuf(this.window._icon, pixbuf);
             this.window._icon.width = Math.min(ICON_SIZE, pixbuf.width);
             this.window._icon.height = Math.min(ICON_SIZE, pixbuf.height);
@@ -187,8 +231,8 @@ Breadcrumb.prototype = {
         this._mouseIsOverButton = false;
 
         this.button = new Big.Box({ reactive: true,
-                                    padding_left: 6,
-                                    padding_right: 6,
+                                    padding_left: 9,
+                                    padding_right: 9,
                                     orientation: Big.BoxOrientation.HORIZONTAL,
                                     y_align: Big.BoxAlignment.CENTER });
         this._button = this.button;

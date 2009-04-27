@@ -65,7 +65,7 @@ function start() {
 
     overlay = new Overlay.Overlay();
     wm = new WindowManager.WindowManager();
-    
+
     let display = global.screen.get_display();
     let toggleOverlay = function(display) {
         if (overlay.visible) {
@@ -94,7 +94,7 @@ function start() {
 
     display.connect('overlay-key', toggleOverlay);
     global.connect('panel-main-menu', toggleOverlay);
-    
+
     Mainloop.idle_add(_removeUnusedWorkspaces);
 }
 
@@ -167,6 +167,9 @@ function show_overlay() {
     if (startModal()) {
         overlayActive = true;
         overlay.show();
+        let breadcrumbs = panel.breadcrumbs;
+        if (breadcrumbs._active != breadcrumbs.activities)
+            breadcrumbs.activate(breadcrumbs.activities);
     }
 }
 
@@ -174,4 +177,8 @@ function hide_overlay() {
     overlay.hide();
     overlayActive = false;
     endModal();
+    let breadcrumbs = panel.breadcrumbs;
+    if (breadcrumbs._active == breadcrumbs.activities)
+        breadcrumbs.activate(breadcrumbs.workspace);
+
 }

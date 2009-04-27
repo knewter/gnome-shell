@@ -27,6 +27,8 @@ WindowManager.prototype = {
         this._mapping = [];
         this._destroying = [];
 
+        this.animated = true;
+
         this._switchData = null;
         this._shellwm.connect('switch-workspace',
             function(o, from, to, direction) {
@@ -47,6 +49,9 @@ WindowManager.prototype = {
             });
         this._shellwm.connect('maximize',
             function(o, actor, tx, ty, tw, th) {
+                let breadcrumbs = Main.panel.breadcrumbs;
+                if (breadcrumbs._active != breadcrumbs.window)
+                    breadcrumbs.activate(breadcrumbs.window);
                 me._maximizeWindow(actor, tx, ty, tw, th);
             });
         this._shellwm.connect('kill-maximize',
@@ -55,6 +60,9 @@ WindowManager.prototype = {
             });
         this._shellwm.connect('unmaximize',
             function(o, actor, tx, ty, tw, th) {
+                let breadcrumbs = Main.panel.breadcrumbs;
+                if (breadcrumbs._active == breadcrumbs.window)
+                    breadcrumbs.activate(breadcrumbs.workspace);
                 me._unmaximizeWindow(actor, tx, ty, tw, th);
             });
         this._shellwm.connect('kill-unmaximize',
@@ -80,6 +88,8 @@ WindowManager.prototype = {
     },
 
     _shouldAnimate : function(actor) {
+        if (!this.animated)
+            return false;
         if (Main.overlayActive)
             return false;
         if (actor && (actor.get_window_type() != Meta.CompWindowType.NORMAL))
@@ -153,7 +163,7 @@ WindowManager.prototype = {
         let scale_y = target_height / actor.height;
         let anchor_x = (actor.x - target_x) * actor.width/(target_width - actor.width);
         let anchor_y = (actor.y - target_y) * actor.height/(target_height - actor.height);
-        
+
         actor.move_anchor_point(anchor_x, anchor_y);
 
         this._maximizing.push(actor);
@@ -202,7 +212,7 @@ WindowManager.prototype = {
         actor.move_anchor_point_from_gravity(Clutter.Gravity.CENTER);
         actor.set_scale(0.0, 0.0);
         actor.show();
-        
+
         /* scale window up from 0x0 to normal size */
         this._mapping.push(actor);
         Tweener.addTween(actor,
@@ -241,7 +251,7 @@ WindowManager.prototype = {
         }
 
         actor.move_anchor_point_from_gravity(Clutter.Gravity.CENTER);
-        
+
         /* anachronistic 'tv-like' effect - squash on y axis, leave x alone */
         this._destroying.push(actor);
         Tweener.addTween(actor,
@@ -257,7 +267,7 @@ WindowManager.prototype = {
                            onOverwriteParams: [actor]
                          });
     },
-    
+
     _destroyWindowDone : function(actor) {
         if (this._removeEffect(this._destroying, actor)) {
             this._shellwm.completed_destroy(actor);
