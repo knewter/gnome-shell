@@ -19,6 +19,8 @@ typedef struct _ShellGlobalClass ShellGlobalClass;
 #define SHELL_IS_GLOBAL_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), SHELL_TYPE_GLOBAL))
 #define SHELL_GLOBAL_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS ((obj), SHELL_TYPE_GLOBAL, ShellGlobalClass))
 
+#define SHELL_GCONF_DIR "/desktop/gnome/shell"
+
 struct _ShellGlobalClass
 {
   GObjectClass parent_class;
@@ -35,6 +37,10 @@ gboolean shell_clutter_texture_set_from_pixbuf (ClutterTexture *texture,
                                                 GdkPixbuf      *pixbuf);
 
 GdkPixbuf *shell_get_thumbnail_for_recent_info(GtkRecentInfo  *recent_info);
+
+GdkPixbuf *shell_create_pixbuf_from_image_file(const char *uri, 
+                                               int available_width, 
+                                               int available_height);
 
 GSList *shell_get_categories_for_desktop_file(const char *desktop_file_name);
 
