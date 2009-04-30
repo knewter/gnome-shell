@@ -281,12 +281,19 @@ GenericDisplayItem.prototype = {
      * descriptionText - short description of the item
      * iconActor - ClutterTexture containing the icon image which should be ITEM_DISPLAY_ICON_SIZE size
      */
-    _setItemInfo: function(nameText, descriptionText, iconActor) {
+    _setItemInfo: function(nameText, descriptionText, iconActor, time) {
+        if (!time){
+          var time = "";
+        }
         if (this._name != null) {
             // this also removes this._name from the parent container,
             // so we don't need to call this.actor.remove_actor(this._name) directly
             this._name.destroy();
             this._name = null;
+        } 
+        if (this._time != null) {
+            this._time.destroy();
+            this._time = null;
         } 
         if (this._description != null) {
             this._description.destroy();
@@ -320,6 +327,14 @@ GenericDisplayItem.prototype = {
                                         x: ITEM_DISPLAY_ICON_SIZE + 4,
                                         y: ITEM_DISPLAY_PADDING });
         this.actor.add_actor(this._name);
+        this._time = new Clutter.Text({ color: ITEM_DISPLAY_NAME_COLOR,
+                                        font_name: "Sans 14px",
+                                        width: textWidth,
+                                        ellipsize: Pango.EllipsizeMode.END,
+                                        text: time,
+                                        x: ITEM_DISPLAY_ICON_SIZE + 4 + textWidth - 60,
+                                        y: ITEM_DISPLAY_PADDING });
+        this.actor.add_actor(this._time);
         this._description = new Clutter.Text({ color: ITEM_DISPLAY_DESCRIPTION_COLOR,
                                                font_name: "Sans 12px",
                                                width: textWidth,

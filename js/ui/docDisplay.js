@@ -28,6 +28,7 @@ DocDisplayItem.prototype = {
         this._docInfo = docInfo;
     
         let name = docInfo.get_display_name();
+        let visited = docInfo.get_visited();
 
         // we can possibly display tags in the space for description in the future
         let description = ""; 
@@ -50,7 +51,7 @@ DocDisplayItem.prototype = {
             icon.y = GenericDisplay.ITEM_DISPLAY_PADDING;
         } 
 
-        this._setItemInfo(name, description, icon);
+        this._setItemInfo(name, description, icon, visited.toLocaleFormat("%H:%M"));
     },
 
     //// Public methods ////
